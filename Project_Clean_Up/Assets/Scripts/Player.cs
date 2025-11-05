@@ -4,7 +4,10 @@ using UnityEngine;
 public class PlayerMove : MonoBehaviour
 {
     Vector3 _moveVector;
-    // public float movementSpeed = 5f; // 이동 속도 추가 (만약 이동도 키보드로 한다면)
+    // public float movementSpeed = 5f; // 이동 속도 (주석 처리 유지)
+    
+    // ⭐ 추가: 회전 속도 변수 (Inspector에서 조절 가능)
+    public float rotationSpeed = 200f; // 초당 회전할 각도 (Degree per second)
 
     void Update()
     {
@@ -21,42 +24,44 @@ public class PlayerMove : MonoBehaviour
         _moveVector = PoolInput();
     }
 
-    // ⭐ PoolInput 함수 수정: 조이스틱 대신 키보드 A/D, W/S 입력을 받습니다.
+    // PoolInput 함수: A/D 키 입력을 받습니다.
     public Vector3 PoolInput()
     {
         // "Horizontal" 축 (A 키: -1, D 키: 1)
         float h = Input.GetAxis("Horizontal"); 
         
-        // "Vertical" 축 (W 키: 1, S 키: -1) (만약 이동도 사용한다면)
+        // "Vertical" 축 (W 키: 1, S 키: -1) (현재 회전에는 사용하지 않음)
         float v = Input.GetAxis("Vertical"); 
         
-        // 방향 벡터 생성 및 정규화
-        // 2D 게임이라면 Z는 0으로 둡니다.
+        // 회전을 위해 h값만 사용하고, moveDir 벡터는 그대로 유지합니다.
         Vector3 moveDir = new Vector3(h, v, 0).normalized;
 
         return moveDir;
     }
 
-    // ⭐ Move 함수 수정: 입력이 있을 때만 각도 계산 및 회전
+    // ⭐ 수정된 Move 함수: A/D 키 입력에 따라 점진적으로 회전합니다.
     public void Move()
     {
-        // 플레이어 이동 (선택 사항: 키보드로 이동도 처리할 경우)
+        // 1. 플레이어 이동 (주석 처리 유지)
         // transform.position += _moveVector * movementSpeed * Time.fixedDeltaTime;
 
-        // 회전 처리 (각도 조정)
-        // _moveVector.x와 _moveVector.y 중 하나라도 0이 아니면 회전 각도를 계산합니다.
-        if (_moveVector.x != 0 || _moveVector.y != 0) 
+        // 2. 점진적 회전 처리
+        
+        // Horizontal 입력 값 (-1.0 ~ 1.0)을 가져옵니다.
+        float horizontalInput = _moveVector.x;
+        
+        // 입력이 0이 아닐 때만 회전합니다.
+        if (Mathf.Abs(horizontalInput) > 0.01f) // 부동 소수점 비교를 위해 작은 값 사용
         {
-            // Atan2는 벡터의 각도를 라디안으로 반환합니다. (Y축이 0도인 기준)
-            // 인자 순서: Atan2(y, x) -> 여기서는 (x, y) 순서를 유지합니다.
-            float rad = Mathf.Atan2(_moveVector.x, _moveVector.y);
-            
-            // 라디안을 각도로 변환
-            float angle = (rad * 180f) / Mathf.PI;
+            // 원하는 회전 각도를 계산합니다. (A키는 왼쪽, D키는 오른쪽)
+            // 현재 2D(Z축 회전)에서 양수 Z축 회전은 반시계(왼쪽)입니다.
+            // A 키 (-1) -> 양의 회전: 왼쪽 회전
+            // D 키 (1) -> 음의 회전: 오른쪽 회전
+            float rotateAmount = -horizontalInput * rotationSpeed * Time.fixedDeltaTime;
 
-            // Z축 회전 설정 (2D에서 일반적으로 Z축 회전을 사용)
-            // 기존 코드처럼 Z축 회전 각도를 설정합니다.
-            this.transform.localEulerAngles = new Vector3(0, 0, (-angle));
+            // 현재 회전에 계산된 회전량을 적용하여 Z축으로 회전합니다.
+            // Space.Self를 사용하여 로컬 좌표계를 기준으로 회전합니다.
+            transform.Rotate(0, 0, rotateAmount, Space.Self);
         }
     }
 
