@@ -3,11 +3,13 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    private Rigidbody2D rigid2D; 
+    public Vector2 initialVelocity = new Vector2(1f,0f);
+    
+    private Rigidbody2D rb; 
 
     Vector3 _moveVector;
     public float rotationSpeed = 200f; // 초당 회전할 각도 (Degree per second)
-    public float moveSpeed = 500f; // 속력
+    // public float moveSpeed = 500f; // 속력
 
     public ArmGrabSensor armLSensor;
     public ArmGrabSensor armRSensor;
@@ -17,18 +19,25 @@ public class PlayerMove : MonoBehaviour
     // 쓰레기가 붙잡힐 팔의 Transform
     private Transform holdingArm = null;
 
+    private bool isTouchWall = false;
+
     void Awake() 
     {
-        rigid2D = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
+
+        if (rb != null)
+        {
+            rb.velocity = initialVelocity;
+        }
     }
 
     void Update()
     {
         HandleInput();
         
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (isTouchWall && Input.GetKeyDown(KeyCode.Space))
         {
-            Shoot();
+            KickWall();
         }
         
         // 쓰레기 집기/놓기 처리
@@ -66,9 +75,9 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    public void Shoot()
+    public void KickWall()
     {
-        rigid2D.AddForce(-transform.right * moveSpeed, ForceMode2D.Force); 
+        rb.AddForce(transform.up * 2.0f, ForceMode2D.Impulse); 
     }
 
     // 현재 쓰레기를 잡고 있는지 확인하는 Public 함수
@@ -140,7 +149,7 @@ public class PlayerMove : MonoBehaviour
             {
                 trashRb.isKinematic = false;
                 // 놓는 순간 플레이어의 속도를 쓰레기에게 적용하여 던지는 느낌을 줄 수 있습니다.
-                trashRb.velocity = rigid2D.velocity; 
+                trashRb.velocity = rb.velocity; 
             }
             
             // 3. 상태 초기화
@@ -155,11 +164,12 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnCollisionEnter2D(Collision2D other)
     {
-        if (collision.gameObject.CompareTag("Wall"))
+        if (other.gameObject.CompareTag("Wall"))
         {
             // 벽 충돌 처리
+            isTouchWall = true;
         }
     }
 }
