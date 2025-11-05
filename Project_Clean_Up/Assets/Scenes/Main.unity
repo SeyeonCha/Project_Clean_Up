@@ -1713,7 +1713,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 200
-  moveSpeed: 500
+  moveSpeed: 300
   armLSensor: {fileID: 936367375}
   armRSensor: {fileID: 1422929166}
 --- !u!50 &1620490594

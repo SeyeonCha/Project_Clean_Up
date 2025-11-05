@@ -33,20 +33,6 @@ public class PlayerMove : MonoBehaviour
         
         // 쓰레기 집기/놓기 처리
         HandleTrashGrab();
-
-        // 쓰레기 위치 업데이트
-        UpdateHeldTrashPosition();
-
-        // PlayerMove.cs의 Update 함수 중
-        if (armLSensor.currentTouchingTrash != null)
-        {
-            Debug.Log("닿음 (L)"); // ⭐ 어떤 팔인지 명확하게 수정
-        }
-        // 2. ArmR 센서가 쓰레기에 닿았는지 확인
-        else if (armRSensor.currentTouchingTrash != null)
-        {
-            Debug.Log("닿음 (R)"); // ⭐ 어떤 팔인지 명확하게 수정
-        }
     }
 
     void FixedUpdate()
@@ -166,19 +152,6 @@ public class PlayerMove : MonoBehaviour
             armRSensor.currentTouchingTrash = null;
             
             Debug.Log("Trash 놓기");
-        }
-    }
-
-    private void UpdateHeldTrashPosition()
-    {
-        if (heldTrash != null && holdingArm != null)
-        {
-            // 부모 설정 후에는 이 코드가 필요 없지만, 
-            // 혹시 모를 오차를 위해 위치 동기화를 유지할 수 있습니다.
-            // heldTrash.transform.position = holdingArm.position;
-            // heldTrash.transform.rotation = holdingArm.rotation;
-            
-            // 쓰레기가 팔의 자식이 되었으므로, 자식 관계만으로 위치가 따라옵니다.
         }
     }
 
