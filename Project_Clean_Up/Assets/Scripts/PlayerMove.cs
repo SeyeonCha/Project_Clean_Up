@@ -130,8 +130,11 @@ public class PlayerMove : MonoBehaviour
         // 쓰레기가 Arm의 자식이 됩니다.
         heldTrash.transform.parent = holdingArm;
         
-        heldTrash.transform.position = holdingArm.position;
-        heldTrash.transform.rotation = holdingArm.rotation;
+        // heldTrash.transform.position = holdingArm.position;
+        // heldTrash.transform.rotation = holdingArm.rotation;
+        heldTrash.transform.localPosition = Vector3.zero; 
+        heldTrash.transform.localRotation = Quaternion.identity;  
+        
 
         Debug.Log($"Trash {trashObject.name} 잡기 성공! 팔: {holdingArm.name}");
     }
@@ -171,6 +174,22 @@ public class PlayerMove : MonoBehaviour
             // 벽 충돌 처리
             isTouchWall = true;
             Debug.Log("벽 충돌");
+        }
+    }
+    void OnCollisionStay2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Wall"))
+        {
+            // 벽 충돌 처리
+            isTouchWall = true;
+            Debug.Log("벽 충돌");
+        }
+    }
+    void  OnCollisionExit2D(Collision2D other) // 이 로직이 필요함
+    {
+        if (other.gameObject.CompareTag("Wall"))
+        {
+            isTouchWall = false; // 벽에서 떨어질 때 초기화
         }
     }
 }
