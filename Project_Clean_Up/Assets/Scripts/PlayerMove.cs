@@ -170,6 +170,7 @@ public class PlayerMove : MonoBehaviour
         {
             // 벽 충돌 처리
             isTouchWall = true;
+            Debug.Log("벽 충돌");
         }
     }
 }
