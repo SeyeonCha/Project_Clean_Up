@@ -7,7 +7,7 @@ public class PlayerMove : MonoBehaviour
 
     Vector3 _moveVector;
     public float rotationSpeed = 200f; // 초당 회전할 각도 (Degree per second)
-    public float shootForce = 500f; // 속력
+    public float moveSpeed = 500f; // 속력
 
     void Awake() 
     {
@@ -54,15 +54,9 @@ public class PlayerMove : MonoBehaviour
             transform.Rotate(0, 0, rotateAmount, Space.Self);
         }
     }
-    public void Shoot() 
+    public void Shoot()
     {
-        // transform.up은 현재 오브젝트가 바라보는 앞쪽 방향 벡터입니다.
-        // AddForce에 Time.deltaTime을 곱하면 의도치 않은 결과를 낳을 수 있으므로 제거했습니다.
-        // AddForce는 이미 프레임 속도와 관계없이 작동하도록 설계되어 있습니다.
-        rigid2D.AddForce(transform.up * shootForce, ForceMode2D.Force);
-        
-        // 참고: ForceMode2D.Impulse는 짧은 순간에 힘을 가해 즉각적인 속도 변화를 만듭니다.
-        // 만약 지속적인 가속을 원하면 ForceMode2D.Force를 사용하세요.
+        rigid2D.AddForce(-transform.right * moveSpeed, ForceMode2D.Force);
     }
 
     void OnCollisionEnter2D(Collision2D collision)
