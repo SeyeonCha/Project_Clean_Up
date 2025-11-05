@@ -1,15 +1,14 @@
-using System;
 using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
+    private GameManager gameManager; // 게임 매니저 참조
     public Vector2 initialVelocity = new Vector2(1f,0f);
     
     private Rigidbody2D rb; 
 
     Vector3 _moveVector;
     public float rotationSpeed = 200f; // 초당 회전할 각도 (Degree per second)
-    // public float moveSpeed = 500f; // 속력
 
     public ArmGrabSensor armLSensor;
     public ArmGrabSensor armRSensor;
@@ -18,12 +17,20 @@ public class PlayerMove : MonoBehaviour
     private GameObject heldTrash = null;
     // 쓰레기가 붙잡힐 팔의 Transform
     private Transform holdingArm = null;
+    
+    // ⭐ 추가: 오프셋 및 레이어 변수
+    private Vector3 initialLocalTrashPosition = Vector3.zero; // 로컬 위치 오프셋
+    private int originalTrashLayer; // 원래 레이어를 저장
+    public int ignoreCollisionLayer = 9; // 충돌 무시 레이어 번호 (유니티 에디터에서 설정)
 
-    private bool isTouchWall = false;
+    private bool isTouchWall = false; // 벽 접촉 상태 플래그
+
 
     void Awake() 
     {
         rb = GetComponent<Rigidbody2D>();
+
+        gameManager = FindObjectOfType<GameManager>();
 
         if (rb != null)
         {
@@ -33,20 +40,42 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
-        HandleInput();
-        
-        if (isTouchWall && Input.GetKeyDown(KeyCode.Space))
+        // 게임이 활성화 상태일 때만 입력 처리
+        if (gameManager == null || gameManager.IsGameActive())
         {
-            KickWall();
+            HandleInput();
+
+            if (isTouchWall && Input.GetKeyDown(KeyCode.Space))
+            {
+                KickWall();
+            }
+
+            HandleTrashGrab();
         }
-        
-        // 쓰레기 집기/놓기 처리
-        HandleTrashGrab();
     }
 
     void FixedUpdate()
     {
-        Move();
+        // 게임이 활성화 상태일 때만 움직임 처리, 아니면 정지
+        if (gameManager == null || gameManager.IsGameActive())
+        {
+            Move();
+        }
+        else
+        {
+            // 게임 오버 시 물리 움직임을 멈춤
+            if (rb != null)
+            {
+                rb.velocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+            }
+        }
+
+        // ⭐ 핵심 수정: FixedUpdate가 끝날 때 로컬 위치를 강제 재설정하여 떨림 현상을 방지합니다.
+        if (heldTrash != null)
+        {
+            heldTrash.transform.localPosition = initialLocalTrashPosition;
+        }
     }
 
     public void HandleInput()
@@ -67,20 +96,22 @@ public class PlayerMove : MonoBehaviour
     public void Move()
     {
         float horizontalInput = _moveVector.x;
-        
+
         if (Mathf.Abs(horizontalInput) > 0.01f)
         {
-            float rotateAmount = -horizontalInput * rotationSpeed * Time.fixedDeltaTime;
+            float currentRotationSpeed = rotationSpeed;
+            if (heldTrash != null) { currentRotationSpeed *= 0.5f; }
+
+            float rotateAmount = -horizontalInput * currentRotationSpeed * Time.fixedDeltaTime;
             transform.Rotate(0, 0, rotateAmount, Space.Self);
         }
     }
-
+    
     public void KickWall()
     {
-        rb.AddForce(transform.up * 2.0f, ForceMode2D.Impulse); 
+        rb.AddForce(transform.up * 2.0f, ForceMode2D.Impulse);
     }
-
-    // 현재 쓰레기를 잡고 있는지 확인하는 Public 함수
+    
     public bool IsHoldingTrash()
     {
         return heldTrash != null;
@@ -89,25 +120,17 @@ public class PlayerMove : MonoBehaviour
     // 쓰레기 집기/놓기 로직
     private void HandleTrashGrab()
     {
-        // 마우스 왼쪽 버튼을 누르고 있는 동안
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && heldTrash == null)
         {
-            // 아직 아무것도 잡고 있지 않을 때만 잡기를 시도합니다.
-            if (heldTrash == null)
+            if (armLSensor != null && armLSensor.currentTouchingTrash != null)
             {
-                // 1. ArmL 센서가 쓰레기에 닿았는지 확인
-                if (armLSensor.currentTouchingTrash != null)
-                {
-                    GrabTrash(armLSensor.currentTouchingTrash, armLSensor.transform);
-                }
-                // 2. ArmR 센서가 쓰레기에 닿았는지 확인
-                else if (armRSensor.currentTouchingTrash != null)
-                {
-                    GrabTrash(armRSensor.currentTouchingTrash, armRSensor.transform);
-                }
+                GrabTrash(armLSensor.currentTouchingTrash, armLSensor.transform);
+            }
+            else if (armRSensor != null && armRSensor.currentTouchingTrash != null)
+            {
+                GrabTrash(armRSensor.currentTouchingTrash, armRSensor.transform);
             }
         }
-        // 마우스 왼쪽 버튼을 뗐을 때 (잡고 있던 것이 있다면 놓습니다)
         else if (Input.GetMouseButtonUp(0))
         {
             DropTrash();
@@ -116,26 +139,32 @@ public class PlayerMove : MonoBehaviour
 
     private void GrabTrash(GameObject trashObject, Transform armTransform)
     {
+        if (heldTrash != null) return;
+        
         heldTrash = trashObject;
         holdingArm = armTransform;
 
-        // 1. Rigidbody2D 물리 해제 (플레이어와 함께 움직이도록)
         Rigidbody2D trashRb = heldTrash.GetComponent<Rigidbody2D>();
         if (trashRb != null)
         {
-            trashRb.isKinematic = true; // 물리 엔진의 영향을 받지 않도록 설정
+            trashRb.isKinematic = true; 
         }
 
-        // 2. 부모-자식 관계 설정 (팔의 위치를 따라가도록)
-        // 쓰레기가 Arm의 자식이 됩니다.
+        // ⭐ 핵심: 쓰레기의 원래 레이어 저장 및 레이어 변경 (충돌 무시)
+        originalTrashLayer = heldTrash.layer;
+        heldTrash.layer = ignoreCollisionLayer; 
+
+        // 오프셋 계산 및 저장
+        // InverseTransformPoint를 사용하여 월드 좌표를 로컬 좌표로 정확히 변환
+        Vector3 desiredLocalPosition = holdingArm.InverseTransformPoint(heldTrash.transform.position);
+        initialLocalTrashPosition = desiredLocalPosition;
+
+        // 부모-자식 관계 설정
         heldTrash.transform.parent = holdingArm;
         
-        // heldTrash.transform.position = holdingArm.position;
-        // heldTrash.transform.rotation = holdingArm.rotation;
-        heldTrash.transform.localPosition = Vector3.zero; 
-        heldTrash.transform.localRotation = Quaternion.identity;  
+        // 계산된 로컬 위치 설정
+        heldTrash.transform.localPosition = initialLocalTrashPosition; 
         
-
         Debug.Log($"Trash {trashObject.name} 잡기 성공! 팔: {holdingArm.name}");
     }
 
@@ -143,53 +172,56 @@ public class PlayerMove : MonoBehaviour
     {
         if (heldTrash != null)
         {
-            // 1. 부모-자식 관계 해제
+            // ⭐ 핵심: 쓰레기의 레이어를 원래 레이어로 복원
+            heldTrash.layer = originalTrashLayer; 
+            
+            // 부모-자식 관계 해제
             heldTrash.transform.parent = null;
 
-            // 2. Rigidbody2D 활성화 (물리 적용 재개)
             Rigidbody2D trashRb = heldTrash.GetComponent<Rigidbody2D>();
             if (trashRb != null)
             {
                 trashRb.isKinematic = false;
-                // 놓는 순간 플레이어의 속도를 쓰레기에게 적용하여 던지는 느낌을 줄 수 있습니다.
                 trashRb.velocity = rb.velocity; 
             }
             
-            // 3. 상태 초기화
+            // 상태 및 오프셋 초기화
             heldTrash = null;
             holdingArm = null;
+            initialLocalTrashPosition = Vector3.zero;
 
-            // Arm Sensor의 닿음 정보도 초기화 (필요하다면)
-            armLSensor.currentTouchingTrash = null;
-            armRSensor.currentTouchingTrash = null;
+            if (armLSensor != null) armLSensor.currentTouchingTrash = null;
+            if (armRSensor != null) armRSensor.currentTouchingTrash = null;
             
             Debug.Log("Trash 놓기");
         }
     }
+    
 
+    // 벽 충돌 로직
     void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Wall"))
         {
-            // 벽 충돌 처리
             isTouchWall = true;
             Debug.Log("벽 충돌");
         }
     }
+
+    // 벽 충돌 로직
     void OnCollisionStay2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Wall"))
         {
-            // 벽 충돌 처리
             isTouchWall = true;
             Debug.Log("벽 충돌");
         }
     }
-    void  OnCollisionExit2D(Collision2D other) // 이 로직이 필요함
+    void  OnCollisionExit2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Wall"))
         {
-            isTouchWall = false; // 벽에서 떨어질 때 초기화
+            isTouchWall = false;
         }
     }
 }
