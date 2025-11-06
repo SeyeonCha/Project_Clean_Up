@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerMove : MonoBehaviour
 {
     private GameManager gameManager; // 게임 매니저 참조
-    public Vector2 initialVelocity = new Vector2(1f,0f);
+    public Vector2 initialVelocity = new Vector2(0f,0f);
     
     private Rigidbody2D rb; 
 
@@ -109,7 +109,7 @@ public class PlayerMove : MonoBehaviour
     
     public void KickWall()
     {
-        rb.AddForce(transform.up * 2.0f, ForceMode2D.Impulse);
+        rb.AddForce(transform.up * 4.0f, ForceMode2D.Impulse);
     }
     
     public bool IsHoldingTrash()

@@ -2822,7 +2822,7 @@ Transform:
   m_GameObject: {fileID: 1620490590}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 11.16, y: 4.72, z: 0}
+  m_LocalPosition: {x: 11.26, y: 4.72, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2908,6 +2908,7 @@ MonoBehaviour:
   rotationSpeed: 200
   armLSensor: {fileID: 936367375}
   armRSensor: {fileID: 1422929166}
+  ignoreCollisionLayer: 9
 --- !u!1 &1848452233
 GameObject:
   m_ObjectHideFlags: 0
