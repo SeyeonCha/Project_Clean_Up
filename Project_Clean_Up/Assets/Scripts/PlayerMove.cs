@@ -13,6 +13,10 @@ public class PlayerMove : MonoBehaviour
     public ArmGrabSensor armLSensor;
     public ArmGrabSensor armRSensor;
 
+    // ⭐ 추가: 던지기 힘 조절 변수 (Inspector에서 미세 조정)
+    [Header("Throwing Settings")]
+    public float throwForceMultiplier = 0.05f; // 던지는 힘의 배수
+
     // 현재 잡고 있는 쓰레기 오브젝트
     private GameObject heldTrash = null;
     // 쓰레기가 붙잡힐 팔의 Transform
@@ -140,19 +144,19 @@ public class PlayerMove : MonoBehaviour
     private void GrabTrash(GameObject trashObject, Transform armTransform)
     {
         if (heldTrash != null) return;
-        
+
         heldTrash = trashObject;
         holdingArm = armTransform;
 
         Rigidbody2D trashRb = heldTrash.GetComponent<Rigidbody2D>();
         if (trashRb != null)
         {
-            trashRb.isKinematic = true; 
+            trashRb.isKinematic = true;
         }
 
         // ⭐ 핵심: 쓰레기의 원래 레이어 저장 및 레이어 변경 (충돌 무시)
         originalTrashLayer = heldTrash.layer;
-        heldTrash.layer = ignoreCollisionLayer; 
+        heldTrash.layer = ignoreCollisionLayer;
 
         // 오프셋 계산 및 저장
         // InverseTransformPoint를 사용하여 월드 좌표를 로컬 좌표로 정확히 변환
@@ -161,31 +165,52 @@ public class PlayerMove : MonoBehaviour
 
         // 부모-자식 관계 설정
         heldTrash.transform.parent = holdingArm;
-        
+
         // 계산된 로컬 위치 설정
-        heldTrash.transform.localPosition = initialLocalTrashPosition; 
-        
+        heldTrash.transform.localPosition = initialLocalTrashPosition;
+
         Debug.Log($"Trash {trashObject.name} 잡기 성공! 팔: {holdingArm.name}");
     }
-
+    
+    // 던지기 로직 추가
     private void DropTrash()
     {
         if (heldTrash != null)
         {
-            // ⭐ 핵심: 쓰레기의 레이어를 원래 레이어로 복원
+            // 1. 레이어 복원
             heldTrash.layer = originalTrashLayer; 
             
-            // 부모-자식 관계 해제
+            // 2. 부모-자식 관계 해제
             heldTrash.transform.parent = null;
 
             Rigidbody2D trashRb = heldTrash.GetComponent<Rigidbody2D>();
             if (trashRb != null)
             {
                 trashRb.isKinematic = false;
-                trashRb.velocity = rb.velocity; 
+                
+                // --- ⭐ 던지기 로직 시작 ⭐ ---
+                
+                // 3. 현재 팔의 각속도를 가져옵니다.
+                ArmRotation armRotation = holdingArm.GetComponent<ArmRotation>();
+                float angularSpeed = (armRotation != null) ? armRotation.angularVelocity : 0f;
+                
+                // 4. 팔의 길이를 계산하여 선형 속도를 추정합니다.
+                float radius = Vector3.Distance(heldTrash.transform.position, holdingArm.position);
+                
+                // 5. 선형 속도 (각속도 * 반지름)를 계산합니다. (Deg/s를 m/s로 변환)
+                float linearSpeed = angularSpeed * Mathf.Deg2Rad * radius;
+                
+                // 6. 던지는 방향 (쓰레기가 원운동에서 이탈하는 접선 방향)
+                Vector3 throwDirection = heldTrash.transform.position - holdingArm.position;
+                Vector3 tangentialDirection = Quaternion.Euler(0, 0, 90) * throwDirection.normalized; // 90도 회전
+
+                // 7. 계산된 속도와 배수를 사용하여 힘을 적용
+                float finalThrowForce = linearSpeed * throwForceMultiplier * trashRb.mass; 
+                trashRb.AddForce(tangentialDirection * finalThrowForce, ForceMode2D.Impulse);
+                // --------------------------
             }
             
-            // 상태 및 오프셋 초기화
+            // 상태 초기화
             heldTrash = null;
             holdingArm = null;
             initialLocalTrashPosition = Vector3.zero;

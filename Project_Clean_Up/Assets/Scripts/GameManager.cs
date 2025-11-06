@@ -12,8 +12,8 @@ public class GameManager : MonoBehaviour
     public GameObject retryButton;
     
     [Header("Game End Messages")]
-    public string winMessage = "클리어";
-    public string loseMessage = "게임 오버";
+    public string winMessage = "GAME CLEAR!";
+    public string loseMessage = "GAME OVER!";
 
     // ====== 게임 시간 설정 ======
     public float startingTime = 60f;
