@@ -16,8 +16,8 @@ TagManager:
   - UI
   - Wall
   - Trash
-  - IgnoreCollision
   - Arm
+  - IgnoreCollision
   - 
   - 
   - 
