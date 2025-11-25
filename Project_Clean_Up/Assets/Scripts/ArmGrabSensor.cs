@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class ArmGrabSensor : MonoBehaviour
 {
-    private PlayerMove playerMove;
+    private PlayerGrabThrow playerMove;
     
     // 현재 이 팔에 닿아있는 쓰레기 오브젝트 (최대 1개만 잡는다고 가정)
     [HideInInspector] public GameObject currentTouchingTrash = null;
 
     void Awake()
     {
-        playerMove = transform.parent.GetComponent<PlayerMove>();
+        playerMove = transform.parent.GetComponent<PlayerGrabThrow>();
         if (playerMove == null)
         {
             Debug.LogError("PlayerMove script not found on the parent object.");

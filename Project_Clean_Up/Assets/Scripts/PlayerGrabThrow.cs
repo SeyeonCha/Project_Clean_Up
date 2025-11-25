@@ -1,15 +1,10 @@
 using UnityEngine;
 
-public class PlayerMove : MonoBehaviour
+public class PlayerGrabThrow : MonoBehaviour
 {
     private GameManager gameManager; // 게임 매니저 참조
-    public Vector2 initialVelocity = new Vector2(0f,0f);
     
-    private Rigidbody2D rb; 
-
-    Vector3 _moveVector;
-    public float rotationSpeed = 200f; // 초당 회전할 각도 (Degree per second)
-
+    // private Rigidbody2D rb; 
     public ArmGrabSensor armLSensor;
     public ArmGrabSensor armRSensor;
 
@@ -27,19 +22,18 @@ public class PlayerMove : MonoBehaviour
     private int originalTrashLayer; // 원래 레이어를 저장
     public int ignoreCollisionLayer = 9; // 충돌 무시 레이어 번호 (유니티 에디터에서 설정)
 
-    private bool isTouchWall = false; // 벽 접촉 상태 플래그
-
+    // private bool isTouchWall = false; // 벽 접촉 상태 플래그
 
     void Awake() 
     {
-        rb = GetComponent<Rigidbody2D>();
+        // rb = GetComponent<Rigidbody2D>();
 
         gameManager = FindObjectOfType<GameManager>();
 
-        if (rb != null)
-        {
-            rb.velocity = initialVelocity;
-        }
+        // if (rb != null)
+        // {
+        //     rb.velocity = initialVelocity;
+        // }
     }
 
     void Update()
@@ -47,12 +41,13 @@ public class PlayerMove : MonoBehaviour
         // 게임이 활성화 상태일 때만 입력 처리
         if (gameManager == null || gameManager.IsGameActive())
         {
-            HandleInput();
+            // HandleInput();
 
-            if (isTouchWall && Input.GetKeyDown(KeyCode.Space))
-            {
-                KickWall();
-            }
+            // // 벽에 닿았고 스페이스바 눌리면 실행
+            // if (isTouchWall && Input.GetKeyDown(KeyCode.Space))
+            // {
+            //     KickWall();
+            // }
 
             HandleTrashGrab();
         }
@@ -61,19 +56,19 @@ public class PlayerMove : MonoBehaviour
     void FixedUpdate()
     {
         // 게임이 활성화 상태일 때만 움직임 처리, 아니면 정지
-        if (gameManager == null || gameManager.IsGameActive())
-        {
-            Move();
-        }
-        else
-        {
-            // 게임 오버 시 물리 움직임을 멈춤
-            if (rb != null)
-            {
-                rb.velocity = Vector2.zero;
-                rb.angularVelocity = 0f;
-            }
-        }
+        // if (gameManager == null || gameManager.IsGameActive())
+        // {
+        //     Move();
+        // }
+        // else
+        // {
+        //     // 게임 오버 시 물리 움직임을 멈춤
+        //     if (rb != null)
+        //     {
+        //         rb.velocity = Vector2.zero;
+        //         rb.angularVelocity = 0f;
+        //     }
+        // }
 
         // ⭐ 핵심 수정: FixedUpdate가 끝날 때 로컬 위치를 강제 재설정하여 떨림 현상을 방지합니다.
         if (heldTrash != null)
@@ -81,41 +76,6 @@ public class PlayerMove : MonoBehaviour
             heldTrash.transform.localPosition = initialLocalTrashPosition;
         }
     }
-
-    public void HandleInput()
-    {
-        _moveVector = PoolInput();
-    }
-
-    public Vector3 PoolInput()
-    {
-        float h = Input.GetAxis("Horizontal"); 
-        float v = Input.GetAxis("Vertical"); 
-        
-        Vector3 moveDir = new Vector3(h, v, 0).normalized;
-
-        return moveDir;
-    }
-
-    public void Move()
-    {
-        float horizontalInput = _moveVector.x;
-
-        if (Mathf.Abs(horizontalInput) > 0.01f)
-        {
-            float currentRotationSpeed = rotationSpeed;
-            if (heldTrash != null) { currentRotationSpeed *= 0.5f; }
-
-            float rotateAmount = -horizontalInput * currentRotationSpeed * Time.fixedDeltaTime;
-            transform.Rotate(0, 0, rotateAmount, Space.Self);
-        }
-    }
-    
-    public void KickWall()
-    {
-        rb.AddForce(transform.up * 4.0f, ForceMode2D.Impulse);
-    }
-    
     public bool IsHoldingTrash()
     {
         return heldTrash != null;
@@ -206,7 +166,7 @@ public class PlayerMove : MonoBehaviour
 
                 // 7. 계산된 속도와 배수를 사용하여 힘을 적용
                 float finalThrowForce = linearSpeed * throwForceMultiplier * trashRb.mass; 
-                trashRb.AddForce(tangentialDirection * finalThrowForce, ForceMode2D.Impulse);
+                trashRb.AddForce(tangentialDirection * finalThrowForce*2, ForceMode2D.Impulse);
                 // --------------------------
             }
             
@@ -222,31 +182,4 @@ public class PlayerMove : MonoBehaviour
         }
     }
     
-
-    // 벽 충돌 로직
-    void OnCollisionEnter2D(Collision2D other)
-    {
-        if (other.gameObject.CompareTag("Wall"))
-        {
-            isTouchWall = true;
-            Debug.Log("벽 충돌");
-        }
-    }
-
-    // 벽 충돌 로직
-    void OnCollisionStay2D(Collision2D other)
-    {
-        if (other.gameObject.CompareTag("Wall"))
-        {
-            isTouchWall = true;
-            Debug.Log("벽 충돌");
-        }
-    }
-    void  OnCollisionExit2D(Collision2D other)
-    {
-        if (other.gameObject.CompareTag("Wall"))
-        {
-            isTouchWall = false;
-        }
-    }
 }

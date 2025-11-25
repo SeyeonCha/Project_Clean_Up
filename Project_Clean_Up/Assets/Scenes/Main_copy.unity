@@ -1666,7 +1666,6 @@ GameObject:
   - component: {fileID: 936367374}
   - component: {fileID: 936367373}
   - component: {fileID: 936367375}
-  - component: {fileID: 936367376}
   m_Layer: 8
   m_Name: ArmL
   m_TagString: Arm
@@ -1683,7 +1682,7 @@ Transform:
   m_GameObject: {fileID: 936367371}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.5, y: 0.16, z: 0}
+  m_LocalPosition: {x: -0.41, y: -0.48, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1789,20 +1788,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentTouchingTrash: {fileID: 0}
---- !u!114 &936367376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 936367371}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ff539dd6b5484e8e938d4adf800133b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rotationSpeed: 10
-  angularVelocity: 0
 --- !u!1 &1347289521
 GameObject:
   m_ObjectHideFlags: 0
@@ -2245,7 +2230,6 @@ GameObject:
   - component: {fileID: 1422929165}
   - component: {fileID: 1422929164}
   - component: {fileID: 1422929166}
-  - component: {fileID: 1422929167}
   m_Layer: 8
   m_Name: ArmR
   m_TagString: Arm
@@ -2262,7 +2246,7 @@ Transform:
   m_GameObject: {fileID: 1422929162}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.41, y: -0.03, z: 0}
+  m_LocalPosition: {x: 0.39, y: -0.54, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2368,20 +2352,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentTouchingTrash: {fileID: 0}
---- !u!114 &1422929167
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1422929162}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ff539dd6b5484e8e938d4adf800133b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rotationSpeed: 10
-  angularVelocity: 0
 --- !u!1 &1491556822
 GameObject:
   m_ObjectHideFlags: 0
@@ -2747,6 +2717,7 @@ GameObject:
   - component: {fileID: 1620490595}
   - component: {fileID: 1620490594}
   - component: {fileID: 1620490596}
+  - component: {fileID: 1620490597}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2795,12 +2766,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 11eb7dcb657e84c72ab1cb8ac71b252b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dc6955d72b4142c583fcb26052984bcb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 3.6, y: 3}
+  m_Size: {x: 0.66, y: 1.39}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -2814,15 +2785,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1620490590}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 11.26, y: 4.72, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: 0.6827876, w: 0.73061705}
+  m_LocalPosition: {x: 9.89, y: 4.04, z: 0}
+  m_LocalScale: {x: 1.567557, y: 1.567557, z: 1.567557}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 936367372}
   - {fileID: 1422929163}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 86.124}
 --- !u!50 &1620490594
 Rigidbody2D:
   serializedVersion: 4
@@ -2882,8 +2853,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 1.5}
+  m_Offset: {x: 0.00806828, y: -0.34720454}
+  m_Size: {x: 1.3261683, y: 1.9769019}
   m_Direction: 0
 --- !u!114 &1620490596
 MonoBehaviour:
@@ -2894,14 +2865,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 1620490590}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d18b59792df34d0ea4cd42becd8661c, type: 3}
+  m_Script: {fileID: 11500000, guid: 2c72145b0d4f9b647943230764573b1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialVelocity: {x: 0, y: 0}
-  rotationSpeed: 200
-  armLSensor: {fileID: 936367375}
-  armRSensor: {fileID: 1422929166}
-  throwForceMultiplier: 0.1
+  kickForce: 4
+  rotationSpeed: 100
+  coyoteTimeDuration: 0.15
+  inputBufferDuration: 0.15
+--- !u!114 &1620490597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1620490590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f813edc67b6d5f449888af06e590afef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  armLSensor: {fileID: 0}
+  armRSensor: {fileID: 0}
+  heldTrash: {fileID: 0}
+  throwForceMultiplier: 0.05
   ignoreCollisionLayer: 9
 --- !u!1 &1848452233
 GameObject:
