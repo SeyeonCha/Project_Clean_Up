@@ -22,18 +22,12 @@ public class PlayerGrabThrow : MonoBehaviour
     private int originalTrashLayer; // 원래 레이어를 저장
     public int ignoreCollisionLayer = 9; // 충돌 무시 레이어 번호 (유니티 에디터에서 설정)
 
-    // private bool isTouchWall = false; // 벽 접촉 상태 플래그
 
     void Awake() 
     {
-        // rb = GetComponent<Rigidbody2D>();
 
         gameManager = FindObjectOfType<GameManager>();
 
-        // if (rb != null)
-        // {
-        //     rb.velocity = initialVelocity;
-        // }
     }
 
     void Update()
@@ -41,35 +35,12 @@ public class PlayerGrabThrow : MonoBehaviour
         // 게임이 활성화 상태일 때만 입력 처리
         if (gameManager == null || gameManager.IsGameActive())
         {
-            // HandleInput();
-
-            // // 벽에 닿았고 스페이스바 눌리면 실행
-            // if (isTouchWall && Input.GetKeyDown(KeyCode.Space))
-            // {
-            //     KickWall();
-            // }
-
             HandleTrashGrab();
         }
     }
 
     void FixedUpdate()
     {
-        // 게임이 활성화 상태일 때만 움직임 처리, 아니면 정지
-        // if (gameManager == null || gameManager.IsGameActive())
-        // {
-        //     Move();
-        // }
-        // else
-        // {
-        //     // 게임 오버 시 물리 움직임을 멈춤
-        //     if (rb != null)
-        //     {
-        //         rb.velocity = Vector2.zero;
-        //         rb.angularVelocity = 0f;
-        //     }
-        // }
-
         // ⭐ 핵심 수정: FixedUpdate가 끝날 때 로컬 위치를 강제 재설정하여 떨림 현상을 방지합니다.
         if (heldTrash != null)
         {

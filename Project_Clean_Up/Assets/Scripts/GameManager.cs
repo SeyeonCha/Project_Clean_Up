@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro; 
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
@@ -33,6 +34,20 @@ public class GameManager : MonoBehaviour
     private int trashRemaining; 
     private int trashCollected = 0;
 
+    // 부품 개수 추적
+    private int partsCollected = 0;
+    public bool ExperimentCompleted = false;
+
+    public GameObject experimentButton;
+
+    [Header("Bomb Spawning")]
+    public GameObject bombPrefab;            // 폭탄 프리팹
+    public float minBombSpawnTime = 10f;     // 최소 스폰 대기 시간
+    public float maxBombSpawnTime = 25f;     // 최대 스폰 대기 시간
+
+    public int maxBombsToSpawn = 2;
+    private int bombsSpawned = 0;
+
     void Start()
     {
         // 초기화
@@ -46,9 +61,13 @@ public class GameManager : MonoBehaviour
         // 쓰레기 생성
         SpawnTrashObjects();
 
+        StartCoroutine(SpawnBombsRoutine());
+
         // 초기 UI 업데이트
         UpdateUIText();
         UpdateRemainingText();
+
+        
     }
 
     void Update()
@@ -92,6 +111,39 @@ public class GameManager : MonoBehaviour
             Instantiate(trashPrefab, randomPosition, Quaternion.identity);
         }
     }
+    private IEnumerator SpawnBombsRoutine()
+    {
+        if (bombPrefab == null)
+        {
+            Debug.LogError("Bomb Prefab이 GameManager에 연결되지 않았습니다!");
+            yield break; // 코루틴 종료
+        }
+        
+        // 게임이 끝날 때까지 무한 루프
+        while (!isGameOver && bombsSpawned < maxBombsToSpawn)
+        {
+            // 1. 랜덤한 시간 대기
+            float waitTime = Random.Range(minBombSpawnTime, maxBombSpawnTime);
+            yield return new WaitForSeconds(waitTime);
+
+            // 게임 오버 상태가 되면 루프를 빠져나옴
+            if (isGameOver) break; 
+            
+            // 2. 맵 범위 내에서 랜덤 위치 계산
+            Vector3 randomPosition = new Vector3(
+                Random.Range(mapBounds.min.x, mapBounds.max.x),
+                Random.Range(mapBounds.min.y, mapBounds.max.y),
+                0 // 2D이므로 Z축은 0
+            );
+
+            // 3. 폭탄 생성
+            // 생성된 폭탄 오브젝트에 Bomb.cs 스크립트가 붙어 있어야 타이머가 작동합니다.
+            Instantiate(bombPrefab, randomPosition, Quaternion.identity);
+
+            bombsSpawned++;
+            Debug.Log($"폭탄 스폰됨: {randomPosition}");
+        }
+    }
 
     // ===================================
     // ⭐ UI 업데이트 및 클리어 로직
@@ -132,6 +184,16 @@ public class GameManager : MonoBehaviour
         {
             GameOver(true); // 모든 쓰레기를 모았으므로 클리어
         }
+    }
+    public void PartsCollected(GameObject part)
+    {
+        if (isGameOver) return;
+        partsCollected++;
+        if (partsCollected >= 3)
+        {
+            experimentButton.SetActive(true);
+        }
+
     }
 
     // ===================================

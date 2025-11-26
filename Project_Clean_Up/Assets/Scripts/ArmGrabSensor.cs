@@ -19,7 +19,7 @@ public class ArmGrabSensor : MonoBehaviour
     // Arm 콜라이더가 Trash 태그를 가진 오브젝트와 닿기 시작할 때
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Trash") && playerMove.IsHoldingTrash() == false)
+        if ((other.CompareTag("Trash") || other.CompareTag("parts")) && playerMove.IsHoldingTrash() == false)
         {
             currentTouchingTrash = other.gameObject;
             Debug.Log($"{gameObject.name}이 Trash에 닿음: {currentTouchingTrash.name}");
@@ -29,7 +29,7 @@ public class ArmGrabSensor : MonoBehaviour
     // Arm 콜라이더가 Trash 태그를 가진 오브젝트에서 떨어질 때
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Trash"))
+        if (other.CompareTag("Trash") || other.CompareTag("parts"))
         {
             // 닿아있던 쓰레기가 맞는지 확인 후 해제
             if (other.gameObject == currentTouchingTrash)

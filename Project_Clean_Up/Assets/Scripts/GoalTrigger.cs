@@ -17,6 +17,7 @@ public class GoalTrigger : MonoBehaviour
     // ⭐ 쓰레기가 골대에 들어왔는지 감지합니다.
     void OnTriggerEnter2D(Collider2D other)
     {
+        
         if (other.CompareTag("Trash") && gameManager != null)
         {
             // 닿은 오브젝트가 쓰레기 태그를 가지고 있다면,
