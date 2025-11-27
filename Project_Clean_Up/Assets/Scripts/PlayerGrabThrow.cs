@@ -1,10 +1,13 @@
 using UnityEngine;
+using Photon.Pun; // ✨ 추가: Photon 기능을 사용하기 위해 필요합니다.
 
-public class PlayerGrabThrow : MonoBehaviour
+public class PlayerGrabThrow : MonoBehaviourPun
 {
     private GameManager gameManager; // 게임 매니저 참조
     
-    // private Rigidbody2D rb; 
+    // 💡 PhotonView는 PlayerMovement 스크립트처럼 이미 이 컴포넌트가 붙은 GameObject에 있다고 가정합니다.
+    public PhotonView PV; // 이 컴프넌트가 붙은 오브젝트의 PhotonView
+
     public ArmGrabSensor armLSensor;
     public ArmGrabSensor armRSensor;
 
@@ -25,9 +28,12 @@ public class PlayerGrabThrow : MonoBehaviour
 
     void Awake() 
     {
-
         gameManager = FindObjectOfType<GameManager>();
-
+        // PV를 수동으로 할당하지 않았다면 Awake에서 GetComponent로 가져와야 합니다.
+        if (PV == null)
+        {
+            PV = GetComponent<PhotonView>();
+        }
     }
 
     void Update()
@@ -41,38 +47,84 @@ public class PlayerGrabThrow : MonoBehaviour
 
     void FixedUpdate()
     {
-        // ⭐ 핵심 수정: FixedUpdate가 끝날 때 로컬 위치를 강제 재설정하여 떨림 현상을 방지합니다.
+        // 핵심 수정: FixedUpdate가 끝날 때 로컬 위치를 강제 재설정하여 떨림 현상을 방지합니다.
+        // 모든 클라이언트에서 잡고 있는 쓰레기의 위치를 부모 팔에 고정시킵니다.
         if (heldTrash != null)
         {
             heldTrash.transform.localPosition = initialLocalTrashPosition;
+            // 필요하다면 회전도 고정: heldTrash.transform.localRotation = Quaternion.identity;
         }
     }
+    
     public bool IsHoldingTrash()
     {
         return heldTrash != null;
     }
 
-    // 쓰레기 집기/놓기 로직
+    // 쓰레기 집기/놓기 네트워크 처리 로직 (로컬 플레이어만 입력 처리 및 RPC 호출)
     private void HandleTrashGrab()
     {
+        // ✨ 로컬 플레이어(IsMine)만 입력 처리
+        if (PV == null || !PV.IsMine) return;
+
         if (Input.GetMouseButton(0) && heldTrash == null)
         {
+            GameObject trashToGrab = null;
+            int armIndex = -1; // 0: 왼쪽 팔 (LSensor), 1: 오른쪽 팔 (RSensor)
+
             if (armLSensor != null && armLSensor.currentTouchingTrash != null)
             {
-                GrabTrash(armLSensor.currentTouchingTrash, armLSensor.transform);
+                trashToGrab = armLSensor.currentTouchingTrash;
+                armIndex = 0;
             }
             else if (armRSensor != null && armRSensor.currentTouchingTrash != null)
             {
-                GrabTrash(armRSensor.currentTouchingTrash, armRSensor.transform);
+                trashToGrab = armRSensor.currentTouchingTrash;
+                armIndex = 1;
+            }
+
+            if (trashToGrab != null)
+            {
+                PhotonView trashPV = trashToGrab.GetComponent<PhotonView>();
+                if (trashPV != null)
+                {
+                    // 1. 쓰레기의 소유권을 현재 플레이어에게 요청합니다. (물리 시뮬레이션을 위해)
+                    if (!trashPV.IsMine)
+                    {
+                        trashPV.RequestOwnership();
+                    }
+                    
+                    // 2. RPC를 호출하여 모든 클라이언트에서 잡는 로직을 실행합니다.
+                    PV.RPC("RpcGrabTrash", RpcTarget.All, trashPV.ViewID, armIndex);
+                }
             }
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            DropTrash();
+            if (heldTrash != null)
+            {
+                // RPC를 호출하여 모든 클라이언트에서 놓는 로직을 실행합니다.
+                PV.RPC("RpcDropTrash", RpcTarget.All);
+            }
         }
     }
 
-    private void GrabTrash(GameObject trashObject, Transform armTransform)
+    // 🔗 RPC 수신: 쓰레기 잡기
+    [PunRPC]
+    private void RpcGrabTrash(int trashViewID, int armIndex)
+    {
+        PhotonView trashPV = PhotonView.Find(trashViewID);
+        if (trashPV == null) return;
+
+        // armIndex에 따라 잡을 팔을 결정합니다.
+        Transform armTransform = (armIndex == 0) ? armLSensor.transform : armRSensor.transform;
+
+        // 로컬 로직 실행
+        GrabTrashLogic(trashPV.gameObject, armTransform);
+    }
+
+    // 1️⃣ 로컬 잡기 로직 (GrabTrash -> GrabTrashLogic으로 이름 변경)
+    private void GrabTrashLogic(GameObject trashObject, Transform armTransform)
     {
         if (heldTrash != null) return;
 
@@ -90,7 +142,6 @@ public class PlayerGrabThrow : MonoBehaviour
         heldTrash.layer = ignoreCollisionLayer;
 
         // 오프셋 계산 및 저장
-        // InverseTransformPoint를 사용하여 월드 좌표를 로컬 좌표로 정확히 변환
         Vector3 desiredLocalPosition = holdingArm.InverseTransformPoint(heldTrash.transform.position);
         initialLocalTrashPosition = desiredLocalPosition;
 
@@ -100,11 +151,22 @@ public class PlayerGrabThrow : MonoBehaviour
         // 계산된 로컬 위치 설정
         heldTrash.transform.localPosition = initialLocalTrashPosition;
 
+        // 잡는 순간 회전도 부모와 같게 맞춥니다.
+        heldTrash.transform.localRotation = Quaternion.identity;
+
         Debug.Log($"Trash {trashObject.name} 잡기 성공! 팔: {holdingArm.name}");
     }
     
-    // 던지기 로직 추가
-    private void DropTrash()
+    // 🔗 RPC 수신: 쓰레기 놓기
+    [PunRPC]
+    private void RpcDropTrash()
+    {
+        // 로컬 로직 실행
+        DropTrashLogic();
+    }
+
+    // 2️⃣ 로컬 놓기 로직 (DropTrash -> DropTrashLogic으로 이름 변경)
+    private void DropTrashLogic()
     {
         if (heldTrash != null)
         {
@@ -119,33 +181,39 @@ public class PlayerGrabThrow : MonoBehaviour
             {
                 trashRb.isKinematic = false;
                 
-                // --- ⭐ 던지기 로직 시작 ⭐ ---
-                
-                // 3. 현재 팔의 각속도를 가져옵니다.
-                ArmRotation armRotation = holdingArm.GetComponent<ArmRotation>();
-                float angularSpeed = (armRotation != null) ? armRotation.angularVelocity : 0f;
-                
-                // 4. 팔의 길이를 계산하여 선형 속도를 추정합니다.
-                float radius = Vector3.Distance(heldTrash.transform.position, holdingArm.position);
-                
-                // 5. 선형 속도 (각속도 * 반지름)를 계산합니다. (Deg/s를 m/s로 변환)
-                float linearSpeed = angularSpeed * Mathf.Deg2Rad * radius;
-                
-                // 6. 던지는 방향 (쓰레기가 원운동에서 이탈하는 접선 방향)
-                Vector3 throwDirection = heldTrash.transform.position - holdingArm.position;
-                Vector3 tangentialDirection = Quaternion.Euler(0, 0, 90) * throwDirection.normalized; // 90도 회전
+                // --- ⭐ 던지기 로직 (소유자만 물리 적용) ⭐ ---
+                PhotonView trashPV = heldTrash.GetComponent<PhotonView>();
 
-                // 7. 계산된 속도와 배수를 사용하여 힘을 적용
-                float finalThrowForce = linearSpeed * throwForceMultiplier * trashRb.mass; 
-                trashRb.AddForce(tangentialDirection * finalThrowForce*2, ForceMode2D.Impulse);
+                // 쓰레기의 소유권을 가진 플레이어(물리 시뮬레이션을 담당하는 플레이어)만 힘을 적용합니다.
+                if (trashPV != null && trashPV.IsMine)
+                {
+                    // 3. 현재 팔의 각속도를 가져옵니다.
+                    ArmRotation armRotation = holdingArm.GetComponent<ArmRotation>();
+                    float angularSpeed = (armRotation != null) ? armRotation.angularVelocity : 0f;
+                    
+                    // 4. 팔의 길이를 계산하여 선형 속도를 추정합니다.
+                    float radius = Vector3.Distance(heldTrash.transform.position, holdingArm.position);
+                    
+                    // 5. 선형 속도 (각속도 * 반지름)를 계산합니다. 
+                    float linearSpeed = angularSpeed * Mathf.Deg2Rad * radius;
+                    
+                    // 6. 던지는 방향 (접선 방향)
+                    Vector3 throwDirection = heldTrash.transform.position - holdingArm.position;
+                    Vector3 tangentialDirection = Quaternion.Euler(0, 0, 90) * throwDirection.normalized;
+
+                    // 7. 계산된 속도와 배수를 사용하여 힘을 적용
+                    float finalThrowForce = linearSpeed * throwForceMultiplier * trashRb.mass; 
+                    trashRb.AddForce(tangentialDirection * finalThrowForce*2, ForceMode2D.Impulse);
+                }
                 // --------------------------
             }
             
-            // 상태 초기화
+            // 상태 초기화 (모든 클라이언트에서 실행)
             heldTrash = null;
             holdingArm = null;
             initialLocalTrashPosition = Vector3.zero;
 
+            // 로컬 센서 상태 초기화
             if (armLSensor != null) armLSensor.currentTouchingTrash = null;
             if (armRSensor != null) armRSensor.currentTouchingTrash = null;
             

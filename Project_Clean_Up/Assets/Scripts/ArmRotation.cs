@@ -1,18 +1,37 @@
 using UnityEngine;
+using Photon.Pun; // ✨ 추가
 
-public class ArmRotation : MonoBehaviour
+public class ArmRotation : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상속 변경
 {
-    public float rotationSpeed = 10f; 
-
+    public float rotationSpeed = 10f;
+    
     // ⭐ 추가: 현재 팔의 각속도 (초당 회전 각도)
-    [HideInInspector] public float angularVelocity = 0f; 
+    [HideInInspector] public float angularVelocity = 0f;
+    
+    // ⭐ 추가: PhotonView 참조 및 네트워크 동기화 변수
+    private PhotonView PV;
+    private Quaternion curRot; // 네트워크로 수신된 회전 값
 
     private float previousAngle = 0f;
 
+    void Awake()
+    {
+        PV = GetComponent<PhotonView>();
+        curRot = transform.rotation; // 초기 회전 값 설정
+    }
+
     void Update()
     {
-        RotateArmTowardsMouse();
-        MeasureAngularVelocity();
+        if (PV.IsMine) // ✨ 로컬 플레이어만 마우스 입력 처리
+        {
+            RotateArmTowardsMouse();
+            MeasureAngularVelocity();
+        }
+        else // ✨ 다른 플레이어는 네트워크 데이터로 동기화
+        {
+            // 수신된 회전 값으로 부드럽게 보간
+            transform.rotation = Quaternion.Lerp(transform.rotation, curRot, Time.deltaTime * 10);
+        }
     }
 
     private void RotateArmTowardsMouse()
@@ -56,5 +75,20 @@ public class ArmRotation : MonoBehaviour
         }
 
         previousAngle = currentAngle;
+    }
+
+    // ✨ IPunObservable 구현: 회전 동기화
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            // 🚀 로컬 플레이어: 현재 회전을 전송
+            stream.SendNext(transform.rotation);
+        }
+        else
+        {
+            // 📥 다른 플레이어: 수신된 회전 저장
+            curRot = (Quaternion)stream.ReceiveNext();
+        }
     }
 }

@@ -8,4 +8,19 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Main.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 0
+    path: Assets/Scenes/#00Server/Logo.unity
+    guid: 3be141bef66624956a733c5bd54862a3
+  - enabled: 0
+    path: Assets/Scenes/#00Server/0. Login.unity
+    guid: 0e5cc0c72de45476fbca0b4b5fa72581
+  - enabled: 0
+    path: Assets/Scenes/#00Server/1. MatchLobby.unity
+    guid: a07b5d36987bf429f80587d74b08c9fb
+  - enabled: 0
+    path: Assets/Scenes/#00Server/2. LoadRoom.unity
+    guid: 46fca01b22714486da724145e4302bf8
+  - enabled: 0
+    path: Assets/Scenes/#00Server/3. InGame.unity
+    guid: f2285270e45d34e8bbfbc4833e9ffcf4
   m_configObjects: {}

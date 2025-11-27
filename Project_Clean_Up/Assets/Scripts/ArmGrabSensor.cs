@@ -2,24 +2,26 @@ using UnityEngine;
 
 public class ArmGrabSensor : MonoBehaviour
 {
-    private PlayerGrabThrow playerMove;
+    private PlayerGrabThrow playerGrabThrow; // ✨ 변수명 명확화
     
     // 현재 이 팔에 닿아있는 쓰레기 오브젝트 (최대 1개만 잡는다고 가정)
     [HideInInspector] public GameObject currentTouchingTrash = null;
 
     void Awake()
     {
-        playerMove = transform.parent.GetComponent<PlayerGrabThrow>();
-        if (playerMove == null)
+        // 부모에서 PlayerGrabThrow 스크립트 참조
+        playerGrabThrow = transform.parent.GetComponent<PlayerGrabThrow>();
+        if (playerGrabThrow == null)
         {
-            Debug.LogError("PlayerMove script not found on the parent object.");
+            Debug.LogError("PlayerGrabThrow script not found on the parent object.");
         }
     }
 
     // Arm 콜라이더가 Trash 태그를 가진 오브젝트와 닿기 시작할 때
     void OnTriggerEnter2D(Collider2D other)
     {
-        if ((other.CompareTag("Trash") || other.CompareTag("parts")) && playerMove.IsHoldingTrash() == false)
+        // 쓰레기 태그이고, 아직 플레이어가 아무것도 잡고 있지 않을 때만 감지 상태를 갱신
+        if ((other.CompareTag("Trash") || other.CompareTag("parts")) && playerGrabThrow.IsHoldingTrash() == false)
         {
             currentTouchingTrash = other.gameObject;
             Debug.Log($"{gameObject.name}이 Trash에 닿음: {currentTouchingTrash.name}");

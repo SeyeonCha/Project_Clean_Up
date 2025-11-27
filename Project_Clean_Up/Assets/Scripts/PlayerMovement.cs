@@ -1,12 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
+using TMPro;
+using UnityEngine.UI;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 {
+    public Rigidbody2D rb;
+    // public Animator AN;
+    public SpriteRenderer SR;
+    public PhotonView PV;
+    public TMP_Text NickNameText;
+
+    Vector3 curPos;
+    Quaternion curRot;
+    
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+        }
+        else
+        {
+            CurPos = (Vector3)stream.ReceiveNext();
+            curRot = (Quaternion)stream.ReceiveNext();
+        }
+    }
     private GameManager gameManager; // 게임 매니저 참조
     
-    private Rigidbody2D rb; 
+    //private Rigidbody2D rb; 
 
     // 발차기 관련 변수들
     private bool isTouchingWall = false;
@@ -36,8 +62,13 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector2 lastWallNormal = Vector2.up;
 
+    public Vector3 CurPos { get => curPos; set => curPos = value; }
+
     private void Awake()
     {
+        NickNameText.text = PV.IsMine ? PhotonNetwork.NickName : PV.Owner.NickName;
+        NickNameText.color = PV.IsMine ? Color.green : Color.red;
+
         gameManager = FindObjectOfType<GameManager>();
         
         rb = GetComponent<Rigidbody2D>();
@@ -50,23 +81,35 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        // 게임이 활성화 상태일 때만 입력 처리
-        if (gameManager == null || gameManager.IsGameActive())
+        if (PV.IsMine)
         {
-            // a,d키 인풋 받기
-            GetInput();
+            // 게임이 활성화 상태일 때만 입력 처리
+            if (gameManager == null || gameManager.IsGameActive())
+            {
+                // a,d키 인풋 받기
+                GetInput();
 
-            // 벽 충돌 중 스페이스 감지 
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                inputBufferTimer = inputBufferDuration; // 인풋버퍼 타이머 시작
-            }
-            else
-            {
-                inputBufferTimer -= Time.deltaTime;
+                // 벽 충돌 중 스페이스 감지 
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    inputBufferTimer = inputBufferDuration; // 인풋버퍼 타이머 시작
+                }
+                else
+                {
+                    inputBufferTimer -= Time.deltaTime;
+                }
             }
         }
-
+        // IsMine이 아닌 것들은 부드럽게 위치 동기화
+        else
+        {
+            // 위치 동기화
+            if ((transform.position - curPos).sqrMagnitude >= 100) transform.position = curPos;
+            else transform.position = Vector3.Lerp(transform.position, curPos, Time.deltaTime * 10);
+            
+            // 회전 동기화
+            transform.rotation = Quaternion.Lerp(transform.rotation, curRot, Time.deltaTime * 10);
+        }
     }
 
     private void GetInput()
@@ -202,6 +245,4 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("속도 부스트 종료");
     }
 
-
-    
 }
