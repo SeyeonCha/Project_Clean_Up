@@ -350,8 +350,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
     {
         if (!PhotonNetwork.IsMasterClient || isGameOver) return;
 
-        // 쓰레기와 부품 수집이 모두 완료되었을 때만 버튼 활성화
-        if (trashCollected >= totalTrashCount && partsCollected >= totalPartCount)
+        // 부품 수집이 모두 완료되었을 때만 버튼 활성화
+        if (partsCollected >= totalPartCount)
         {
             // ⭐ 버튼 활성화 RPC는 한 번만 호출
             if (!experimentButton.activeSelf)

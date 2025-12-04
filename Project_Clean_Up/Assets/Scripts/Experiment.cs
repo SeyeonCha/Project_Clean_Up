@@ -41,8 +41,9 @@ public class Experiment : MonoBehaviour
             Destroy(child);
         }
 
-        Debug.Log($"실험 완료 상태이므로, {this.name}의 **모든 자식 오브젝트**가 파괴되었습니다.");
+        //Debug.Log($"실험 완료 상태이므로, {this.name}의 **모든 자식 오브젝트**가 파괴되었습니다.");
     }
+
     // 부품이 실험대에 들어왔는지 감지
     void OnTriggerEnter2D(Collider2D other)
     {

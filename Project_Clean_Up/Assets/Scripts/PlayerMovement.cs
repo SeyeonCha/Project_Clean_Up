@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     public SpriteRenderer SR;
     public PhotonView PV;
     public TMP_Text NickNameText;
+    public Image HealthImage;
 
     Vector3 curPos;
     Quaternion curRot;
@@ -244,5 +245,19 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         itemApplying = false;
         Debug.Log("속도 부스트 종료");
     }
+
+    // 플레이어 데미지 입을 때 불러올 함수
+    public void Hit()
+    {
+        HealthImage.fillAmount -= 0.1f;
+        if (HealthImage.fillAmount <= 0)
+        {
+            GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
+            PV.RPC("DestroyRPC", RpcTarget.AllBuffered);
+        }
+    }
+
+    [PunRPC]
+    void DestroyRPC() => Destroy(gameObject);
 
 }

@@ -36,6 +36,4 @@ public class ExperimentButton : MonoBehaviour
             Debug.Log($"실험 완성 버튼 눌림");
         }
     }
-
-
 }
