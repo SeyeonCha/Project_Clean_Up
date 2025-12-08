@@ -16,8 +16,9 @@ GameObject:
   - component: {fileID: 7431592911317487376}
   - component: {fileID: 6445906099244896968}
   - component: {fileID: 251963080328250137}
+  - component: {fileID: 8242974984114703574}
   m_Layer: 7
-  m_Name: Parts
+  m_Name: Parts_0
   m_TagString: parts
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -223,3 +224,16 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &8242974984114703574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1934413257229219296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a97396b1d1b34d941a6297146a6bc4d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: 0

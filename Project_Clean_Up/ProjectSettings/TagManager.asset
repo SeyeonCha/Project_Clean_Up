@@ -9,6 +9,7 @@ TagManager:
   - Wall
   - item
   - parts
+  - Throwable
   layers:
   - Default
   - TransparentFX

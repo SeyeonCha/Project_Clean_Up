@@ -24,6 +24,7 @@ public class ArmGrabSensor : MonoBehaviour
         if ((other.CompareTag("Trash") || other.CompareTag("parts")) && playerGrabThrow.IsHoldingTrash() == false)
         {
             currentTouchingTrash = other.gameObject;
+            // other.gameObject.GetComponent<ThrowableObject>().SetHeld(); // 잡은 쓰레기 오브젝트의 상태를 held로 변경해주기
             Debug.Log($"{gameObject.name}이 Trash에 닿음: {currentTouchingTrash.name}");
         }
     }
@@ -37,6 +38,7 @@ public class ArmGrabSensor : MonoBehaviour
             if (other.gameObject == currentTouchingTrash)
             {
                 currentTouchingTrash = null;
+                // other.GetComponent<ThrowableObject>().SetThrown();
                 Debug.Log($"{gameObject.name}이 Trash에서 떨어짐");
             }
         }

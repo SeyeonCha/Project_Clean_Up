@@ -190,6 +190,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d18b59792df34d0ea4cd42becd8661c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  throwPower: 7
   PV: {fileID: 5952329421163584506}
   armLSensor: {fileID: 1198963892661325277}
   armRSensor: {fileID: 1769215020979601019}

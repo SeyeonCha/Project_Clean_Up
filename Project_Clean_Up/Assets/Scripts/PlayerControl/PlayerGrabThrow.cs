@@ -4,6 +4,8 @@ using Photon.Pun; // ✨ 추가: Photon 기능을 사용하기 위해 필요합�
 public class PlayerGrabThrow : MonoBehaviourPun
 {
     private GameManager gameManager; // 게임 매니저 참조
+
+    public float throwPower = 7f;
     
     // 💡 PhotonView는 PlayerMovement 스크립트처럼 이미 이 컴포넌트가 붙은 GameObject에 있다고 가정합니다.
     public PhotonView PV; // 이 컴프넌트가 붙은 오브젝트의 PhotonView
@@ -130,7 +132,11 @@ public class PlayerGrabThrow : MonoBehaviourPun
 
         heldTrash = trashObject;
         holdingArm = armTransform;
-
+        if (heldTrash.CompareTag("Trash"))
+        {
+            heldTrash.GetComponent<ThrowableObject>().SetHeld(); // 잡은 쓰레기 오브젝트의 상태를 held로 변경해주기\
+        }
+        
         Rigidbody2D trashRb = heldTrash.GetComponent<Rigidbody2D>();
         if (trashRb != null)
         {
@@ -138,8 +144,10 @@ public class PlayerGrabThrow : MonoBehaviourPun
         }
 
         // ⭐ 핵심: 쓰레기의 원래 레이어 저장 및 레이어 변경 (충돌 무시)
+        Debug.Log($"의심 레이어 지점 1 : {heldTrash.layer}");
         originalTrashLayer = heldTrash.layer;
         heldTrash.layer = ignoreCollisionLayer;
+
 
         // 오프셋 계산 및 저장
         Vector3 desiredLocalPosition = holdingArm.InverseTransformPoint(heldTrash.transform.position);
@@ -171,10 +179,17 @@ public class PlayerGrabThrow : MonoBehaviourPun
         if (heldTrash != null)
         {
             // 1. 레이어 복원
+
+            Debug.Log($"의심 레이어 지점 2 : {originalTrashLayer}");
             heldTrash.layer = originalTrashLayer; 
             
             // 2. 부모-자식 관계 해제
             heldTrash.transform.parent = null;
+            if (heldTrash.CompareTag("Trash"))
+            {
+                heldTrash.GetComponent<ThrowableObject>().SetThrown();
+                Debug.Log("쓰레기 던져짐!!");
+            }
 
             Rigidbody2D trashRb = heldTrash.GetComponent<Rigidbody2D>();
             if (trashRb != null)
@@ -202,8 +217,9 @@ public class PlayerGrabThrow : MonoBehaviourPun
                     Vector3 tangentialDirection = Quaternion.Euler(0, 0, 90) * throwDirection.normalized;
 
                     // 7. 계산된 속도와 배수를 사용하여 힘을 적용
-                    float finalThrowForce = linearSpeed * throwForceMultiplier * trashRb.mass; 
-                    trashRb.AddForce(tangentialDirection * finalThrowForce*2, ForceMode2D.Impulse);
+                    // float finalThrowForce = linearSpeed * throwForceMultiplier * trashRb.mass; 
+                    float finalThrowForce = linearSpeed * throwForceMultiplier * 10f; 
+                    trashRb.AddForce(tangentialDirection * finalThrowForce, ForceMode2D.Impulse);
                 }
                 // --------------------------
             }

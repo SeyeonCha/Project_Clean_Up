@@ -6,6 +6,15 @@ public class Experiment : MonoBehaviour
 {
     private GameManager gameManager;
 
+    // ----- 필드
+    [SerializeField]
+    private int ownerId;
+    public int requiedParts = 3;
+    
+    private int n_collected = 0;
+    public enum TableState {collecting, completed}
+    TableState state = TableState.collecting;
+
     void Start()
     {
         // 씬에서 GameManager를 찾습니다.
@@ -44,33 +53,38 @@ public class Experiment : MonoBehaviour
         //Debug.Log($"실험 완료 상태이므로, {this.name}의 **모든 자식 오브젝트**가 파괴되었습니다.");
     }
 
+
     // 부품이 실험대에 들어왔는지 감지
     void OnTriggerEnter2D(Collider2D other)
     {
-        
-        if (other.CompareTag("parts") && gameManager != null)
+        if (other.CompareTag("parts")&& gameManager != null)
         {
-            // 닿은 오브젝트가 부품 태그를 가지고 있다면,
-            // GameManager에게 부품이 수집되었음을 알립니다.
-            gameManager.PartsCollected(other.gameObject);
+            int i = other.gameObject.GetComponent<Parts>().ownerId;
+            Debug.Log($"parts id : {i}");
+            if (i == this.ownerId)
+            {
+                gameManager.PartsCollected(other.gameObject);
+                Destroy(other.gameObject);
+            }
 
-            //파츠가 실험대 위에 고정되도록 
-            other.transform.SetParent(this.transform);
-            other.transform.localPosition = Vector3.zero;
-            Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                rb.velocity = Vector2.zero;
-                rb.angularVelocity = 0f;
-                rb.isKinematic = true;  // 물리 영향 제거
-            }
-             // 콜라이더 비활성화 
-            Collider2D col = other.GetComponent<Collider2D>();
-            if (col != null)
-            {
-                col.enabled = false;
-            }
-            Debug.Log($"{other.name} 파츠가 실험대 위에 고정됨");
+            //파츠 오브젝트 파괴
+            
+            // other.transform.SetParent(this.transform);
+            // other.transform.localPosition = Vector3.zero;
+            // Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
+            // if (rb != null)
+            // {
+            //     rb.velocity = Vector2.zero;
+            //     rb.angularVelocity = 0f;
+            //     rb.isKinematic = true;  // 물리 영향 제거
+            // }
+            //  // 콜라이더 비활성화 
+            // Collider2D col = other.GetComponent<Collider2D>();
+            // if (col != null)
+            // {
+            //     col.enabled = false;
+            // }
+            // Debug.Log($"{other.name} 파츠가 실험대 위에 고정됨");
         }
     }
 }

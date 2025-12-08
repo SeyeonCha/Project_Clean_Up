@@ -38,7 +38,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     // 발차기 관련 변수들
     private bool isTouchingWall = false;
     // private bool isKicked = false;
-    public float kickForce = 4.0f;
+    public float kickForce = 5.0f;
 
     // 몸통 회전 관련 변수들
     private float h; // 키 인풋을 받을 변수

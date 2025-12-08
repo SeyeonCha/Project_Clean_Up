@@ -31,7 +31,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
     // ====== 쓰레기 및 클리어 조건 설정 (동기화 대상) ======
     [Header("Trash & Spawning")]
     public GameObject trashPrefab;
-    public int totalTrashCount = 10;
+    public int totalTrashCount = 5;
+    public Sprite[] trashImages; // 공격체의 이미지들 <- 인스펙터
 
     // ✨ 부품 관련 변수 추가
     public GameObject partPrefab; // ⭐ 부품 프리팹 (Inspector에서 연결)
@@ -270,7 +271,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
         Debug.Log($"Drug {totalDrugCount}개 스폰 완료 및 색상/부스트 설정 할당.");
     }
 
-    private void SpawnTrashObjects()
+    private void SpawnTrashObjects() // 쓰레기 스폰 함수
     {
         if (!PhotonNetwork.IsMasterClient || trashPrefab == null) return;
 
@@ -279,7 +280,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
             Vector3 randomPosition = GetRandomSpawnPosition();
             
             // ✨ PhotonNetwork.Instantiate를 사용하여 모든 클라이언트에서 생성
-            PhotonNetwork.Instantiate(trashPrefab.name, randomPosition, Quaternion.identity);
+            
+            GameObject obj = PhotonNetwork.Instantiate(trashPrefab.name, randomPosition, Quaternion.identity);
+            // 이미지 변경
+            SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+            sr.sprite = trashImages[i];
         }
     }
 
