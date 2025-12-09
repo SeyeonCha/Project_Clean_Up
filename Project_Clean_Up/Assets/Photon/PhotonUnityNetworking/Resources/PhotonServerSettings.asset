@@ -47,6 +47,10 @@ MonoBehaviour:
   - RpcInitializePartVisuals
   - RpcActivateExperimentButton
   - DestroyRPC
+  - RpcActivateButton
+  - RpcCompleteExperiment
+  - RpcPressButton
+  - RpcSpawnMonsterSequence
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

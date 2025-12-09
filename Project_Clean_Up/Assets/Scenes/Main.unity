@@ -5906,6 +5906,7 @@ GameObject:
   - component: {fileID: 529804135}
   - component: {fileID: 529804134}
   - component: {fileID: 529804137}
+  - component: {fileID: 529804138}
   m_Layer: 0
   m_Name: Experiment Desk
   m_TagString: Untagged
@@ -5974,7 +5975,7 @@ Transform:
   m_GameObject: {fileID: 529804131}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.91, y: -5.1, z: 0}
+  m_LocalPosition: {x: -8.27, y: -6.17, z: 0}
   m_LocalScale: {x: 2.0369623, y: 1.9254774, z: 1.9254774}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6066,7 +6067,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownerId: 0
-  requiedParts: 3
+  requiredParts: 3
+  experimentButton: {fileID: 1640580445}
+  monster: {fileID: 0}
 --- !u!114 &529804137
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6083,9 +6086,28 @@ MonoBehaviour:
   spawnPoint: {fileID: 366520579}
   explosionEffect: {fileID: 1080362673}
   explosionSfx: {fileID: 0}
-  seeds: {fileID: 0}
-  leaf: {fileID: 0}
-  fertilizer: {fileID: 0}
+--- !u!114 &529804138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529804131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 3
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &532934551
 GameObject:
   m_ObjectHideFlags: 0
@@ -13526,6 +13548,7 @@ GameObject:
   - component: {fileID: 1431166139}
   - component: {fileID: 1431166138}
   - component: {fileID: 1431166137}
+  - component: {fileID: 1431166142}
   m_Layer: 0
   m_Name: Experiment Desk (1)
   m_TagString: Untagged
@@ -13541,14 +13564,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1431166135}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.86, y: 4.99, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: 0.99999315, w: -0.003711158}
+  m_LocalPosition: {x: 8.11, y: 4.72, z: 0}
   m_LocalScale: {x: 2.0369623, y: 1.9254774, z: 1.9254774}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 242880932}
   m_Father: {fileID: 1876053370}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180.425}
 --- !u!114 &1431166137
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13565,9 +13588,6 @@ MonoBehaviour:
   spawnPoint: {fileID: 1834916180}
   explosionEffect: {fileID: 242880934}
   explosionSfx: {fileID: 0}
-  seeds: {fileID: 0}
-  leaf: {fileID: 0}
-  fertilizer: {fileID: 0}
 --- !u!61 &1431166138
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -13653,7 +13673,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownerId: 1
-  requiedParts: 3
+  requiredParts: 3
+  experimentButton: {fileID: 1815639503}
+  monster: {fileID: 0}
 --- !u!212 &1431166141
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -13706,6 +13728,28 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1431166142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1431166135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 2
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1491556822
 GameObject:
   m_ObjectHideFlags: 0
@@ -14071,6 +14115,7 @@ GameObject:
   - component: {fileID: 1640580448}
   - component: {fileID: 1640580450}
   - component: {fileID: 1640580449}
+  - component: {fileID: 1640580451}
   m_Layer: 0
   m_Name: complete button
   m_TagString: Untagged
@@ -14139,7 +14184,7 @@ Transform:
   m_GameObject: {fileID: 1640580445}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.91, y: -8.7, z: 0}
+  m_LocalPosition: {x: -4.55, y: -8.53, z: 0}
   m_LocalScale: {x: 2.6500394, y: 2.505, z: 2.505}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14159,6 +14204,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   button_unpressed: {fileID: 21300000, guid: 6c8ad2832b70d604e9e56df2fdc487cc, type: 3}
   button_pressed: {fileID: 21300000, guid: 794ce5ca1e07eb34b84cbd7c25b2ec41, type: 3}
+  experimentTable: {fileID: 529804136}
 --- !u!61 &1640580449
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -14231,6 +14277,28 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1640580451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640580445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 5
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1687644073
 GameObject:
   m_ObjectHideFlags: 0
@@ -14321,6 +14389,7 @@ GameObject:
   - component: {fileID: 1815639507}
   - component: {fileID: 1815639506}
   - component: {fileID: 1815639505}
+  - component: {fileID: 1815639509}
   m_Layer: 0
   m_Name: complete button (1)
   m_TagString: Untagged
@@ -14336,13 +14405,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1815639503}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.91, y: -8.7, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0.9999847, w: 0.005538361}
+  m_LocalPosition: {x: 4.6, y: 7.2, z: 0}
   m_LocalScale: {x: 2.6500394, y: 2.505, z: 2.505}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 673489714}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -179.365}
 --- !u!61 &1815639505
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -14429,6 +14498,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   button_unpressed: {fileID: 21300000, guid: 6c8ad2832b70d604e9e56df2fdc487cc, type: 3}
   button_pressed: {fileID: 21300000, guid: 794ce5ca1e07eb34b84cbd7c25b2ec41, type: 3}
+  experimentTable: {fileID: 1431166140}
 --- !u!212 &1815639508
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -14481,6 +14551,28 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1815639509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1815639503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 4
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1834916179
 GameObject:
   m_ObjectHideFlags: 0
