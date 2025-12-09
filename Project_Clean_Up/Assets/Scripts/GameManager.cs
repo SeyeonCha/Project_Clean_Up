@@ -120,6 +120,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
     {
         if (PhotonNetwork.IsMasterClient)
         {
+            Experiment[] tables = FindObjectsOfType<Experiment>();
+            Player[] players = PhotonNetwork.PlayerList;
+            int count = Mathf.Min(tables.Length, players.Length);
+
+            for (int i = 0; i < count; i++)
+            {
+                int actorNumber = players[i].ActorNumber;
+                tables[i].SetOwner(actorNumber); // 실험대에 플레이어 owner 설정
+            }
+            
             SpawnTrashObjects();
             SpawnPartObjects();
             SpawnObstacleObjects();

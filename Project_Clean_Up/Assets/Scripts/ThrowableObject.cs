@@ -117,8 +117,8 @@ public class ThrowableObject : MonoBehaviour
         // Thrown 상태일 때,
         if (other.gameObject.CompareTag("Player"))
         {
-            // 플레이어 데미지!
-            Debug.Log("플레이어 데이미지!!");
+            // 닿은 플레이어 데미지!
+            Debug.Log("플레이어 데미지!!");
         }
         
         if (ignoreFirstCollision == 0)

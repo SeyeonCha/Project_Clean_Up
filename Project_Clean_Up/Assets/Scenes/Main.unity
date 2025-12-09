@@ -5431,7 +5431,11 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 9fc99e135e04de64b9254a321be0223d, type: 3}
   - {fileID: 21300000, guid: 9fc99e135e04de64b9254a321be0223d, type: 3}
   partPrefab: {fileID: 1934413257229219296, guid: 0e444685d38e54a409da472d749eba26, type: 3}
-  totalPartCount: 3
+  partsImages:
+  - {fileID: 21300000, guid: bd2be2f8e708e7a41a395f6bd46b919b, type: 3}
+  - {fileID: 21300000, guid: 01da3d44ea0d1d64f8f57a1d2ea81523, type: 3}
+  - {fileID: 21300000, guid: 2dcc4abb16ca7e04dba044eb963d8112, type: 3}
+  - {fileID: 21300000, guid: 7d9d3567532c30d448920a903f7f17ed, type: 3}
   drugPrefab: {fileID: 928677696678052251, guid: bc7a43bf828fb478cbfb8fd33f5c6ef6, type: 3}
   totalDrugCount: 2
   drugColorsForSpawning:
@@ -5954,7 +5958,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 462ab61d913b59c4ca649730e4230be5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -6067,9 +6071,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownerId: 0
-  requiredParts: 3
+  requiredParts: 4
   experimentButton: {fileID: 1640580445}
-  monster: {fileID: 0}
 --- !u!114 &529804137
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13672,10 +13675,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a606fe108a518034fa692e9886650a99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ownerId: 1
-  requiredParts: 3
+  ownerId: 0
+  requiredParts: 4
   experimentButton: {fileID: 1815639503}
-  monster: {fileID: 0}
 --- !u!212 &1431166141
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -13716,7 +13718,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 462ab61d913b59c4ca649730e4230be5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -14899,7 +14901,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0.7825651, y: 0.7825651, z: 0}
   m_MaxChunkCount: 16

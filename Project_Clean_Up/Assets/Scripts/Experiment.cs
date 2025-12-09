@@ -9,13 +9,15 @@ public class Experiment : MonoBehaviourPun
 {
     private GameManager gameManager;
 
+    public int ownerId = -1; // -1 : 플레이어 미할당 상태
+
     // ----- 필드
     [SerializeField]
     // private int ownerId; // 0, 1로 설정해두기
     public int requiredParts = 4; // 해당 실험대가 필요로 하는 총 파츠 개수
     public GameObject experimentButton; // 이 실험대의 완성버튼
 
-    public CompletingMonster monster;
+    private CompletingMonster monster;
 
     private int partsCollected = 0; // 각 실험대가 모은 파츠 개수 저장. 
 
@@ -24,6 +26,27 @@ public class Experiment : MonoBehaviourPun
 
     public HashSet<int> collectedPartIds = new HashSet<int>();
 
+    public void SetOwner(int actorNumber)
+    {
+        ownerId = actorNumber;
+
+        // actorNumber 플레이어로 소유권 변경
+        photonView.TransferOwnership(PhotonNetwork.CurrentRoom.GetPlayer(actorNumber));
+
+        // 로컬플레이어의 실험대인 경우만 노란색 윤곽선으로 표시
+        bool isMine = (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber);
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.color = isMine ? new Color(1f, 1f, 0.4f) : Color.white;
+        }
+        // var outline = GetComponent<SpriteOutline>();
+        // if (outline != null)
+        // {
+        //     outline.enabled = isMine;
+        //     outline.color = isMine? Color.yellor:Color.clear;
+        // }
+    }
     void Start()
     {
         if (experimentButton != null)
@@ -116,7 +139,7 @@ public class Experiment : MonoBehaviourPun
 
     }
     [PunRPC]
-    private void RpcCompleteExperiment()
+    private void RpcCompleteExperiment() // 활성화된 버튼이 소유 플레이어와 충돌하면 완성. 
     {
         state = TableState.completed;
         monster.MonsterGenerate();

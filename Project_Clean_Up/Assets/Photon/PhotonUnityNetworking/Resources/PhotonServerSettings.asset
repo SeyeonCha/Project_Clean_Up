@@ -54,6 +54,8 @@ MonoBehaviour:
   - RpcSetTrashSprite
   - RpcSetPartData
   - RpcSetPartSprite
+  - RpcDamagePlayer
+  - RpcInitMonsterOwner
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

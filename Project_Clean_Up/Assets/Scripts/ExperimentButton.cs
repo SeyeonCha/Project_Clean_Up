@@ -29,12 +29,27 @@ public class ExperimentButton : MonoBehaviourPun
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = button_unpressed;
     }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
         if (isPressed) return; // 중복 입력 방지!
 
-        photonView.RPC("RpcPressButton", RpcTarget.All);
+        // 충돌한 플레이어의 pv 가져오기
+        PhotonView pv = other.GetComponent<PhotonView>();
+
+        // 충돌한 플레이어가 자신이면
+        // if (pv.Owner.ActorNumber == experimentTable.ownerId) 
+        // {
+        //     if (PhotonNetwork.IsMasterClient)
+        //     {
+        //         photonView.RPC("RpcPressButton", RpcTarget.All);
+        //     }
+        // }
+        if (PhotonNetwork.IsMasterClient)
+        {
+            photonView.RPC("RpcPressButton", RpcTarget.All);
+        }
         
     }
     [PunRPC]

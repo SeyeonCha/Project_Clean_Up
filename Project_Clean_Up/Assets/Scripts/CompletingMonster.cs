@@ -14,9 +14,12 @@ public class CompletingMonster : MonoBehaviourPun
     private GameManager gameManager;
     private bool alreadySpawned = false;
 
+    private Experiment experimentTable;
+
     void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
+        experimentTable = GetComponent<Experiment>();
     }
 
     // void Update()
@@ -59,10 +62,28 @@ public class CompletingMonster : MonoBehaviourPun
         GameObject monster = PhotonNetwork.Instantiate(monsterPrefab.name,
                                 spawnPoint.position,
                                 Quaternion.identity);
-    
+
+
+        // 몬스터에게 실험대 소유자 정보 전달 -> 같은 ownerId로 만들기
+        int owner = experimentTable.ownerId;
+        PhotonView monsterPV = monster.GetComponent<PhotonView>();
+        photonView.RPC("RpcInitMonsterOwner", RpcTarget.All, monsterPV.ViewID, owner);
+
         Animator anim = monster.GetComponent<Animator>();
         anim.SetTrigger("StartRise");
 
         Debug.Log("몬스터 등장!");
+    }
+    [PunRPC]
+    void RpcInitMonsterOwner(int monsterViewID, int ownerID) // 생성한 monster에 ownerId 설정
+    {
+        PhotonView pv = PhotonView.Find(monsterViewID);
+        if (pv == null) return;
+
+        Monster monster = pv.GetComponent<Monster>();
+        if (monster != null)
+        {
+            monster.SetOwner(ownerID);
+        }
     }
 }
