@@ -51,7 +51,8 @@ public class Monster : MonoBehaviourPun
         // 로컬플레이어의 ActorNumber 가 이 실험대의 주인이 아니면
         if (PhotonNetwork.LocalPlayer.ActorNumber != attackerOwnerId)
         {
-            // 내 데미지 감소. 
+            // 여기!!!!!!!!!!!!! "내(로컬 플레이어) 데미지 감소!"
+            
             Debug.Log("------ 내 데미지 감소 ------");
         }
 
