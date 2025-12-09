@@ -24,6 +24,7 @@ public class ThrowableObject : MonoBehaviour
     private Color originalColor;
     private SpriteRenderer sr;
 
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>(); 
@@ -35,6 +36,7 @@ public class ThrowableObject : MonoBehaviour
 
         SetIdle();
     }
+
     private void Update()
     {
         // // 속도 기반 Idle 전환
@@ -55,7 +57,9 @@ public class ThrowableObject : MonoBehaviour
         
         // 물리 OK
         // col.isTrigger = false;
-        // rb.isKinematic = false;
+        rb.isKinematic = false;
+        col.isTrigger = true;
+        // rb.isKinematic = true;
 
         // 높은 공기저항 
         rb.drag = idleDrag;
@@ -89,8 +93,8 @@ public class ThrowableObject : MonoBehaviour
         gameObject.layer = trashLayer; // 레이어 돌려놓기
 
         // 물리 충돌 ok
-        // col.isTrigger = false;
-        // rb.isKinematic = false;
+        col.isTrigger = false;
+        rb.isKinematic = false;
 
         // 공기저항 0
         rb.drag = 0f;

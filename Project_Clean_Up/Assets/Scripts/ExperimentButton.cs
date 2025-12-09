@@ -2,17 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
-public class ExperimentButton : MonoBehaviour
+public class ExperimentButton : MonoBehaviourPun
 {
     private GameManager gameManager;
 
-    [SerializeField]
-    private Sprite button_unpressed; 
-    [SerializeField]
-    private Sprite button_pressed; 
+    [SerializeField] private Sprite button_unpressed; 
+    [SerializeField] private Sprite button_pressed;
+    
+    public Experiment experimentTable;
 
     private SpriteRenderer spriteRenderer;
+
+    private bool isPressed = false;
     
     void Start()
     {
@@ -22,18 +25,29 @@ public class ExperimentButton : MonoBehaviour
         {
             Debug.LogError("GameManager 스크립트를 찾을 수 없습니다! 게임이 정상 작동하지 않을 수 있습니다.");
         }
+
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = button_unpressed;
     }
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (!other.CompareTag("Player")) return;
+        if (isPressed) return; // 중복 입력 방지!
+
+        photonView.RPC("RpcPressButton", RpcTarget.All);
         
-        if (other.CompareTag("Player") && gameManager != null)
-        {
-            // 이미지 교체. 
-            spriteRenderer.sprite = button_pressed;
-            gameManager.ExperimentCompleted = true;
-            Debug.Log($"실험 완성 버튼 눌림");
-        }
     }
+    [PunRPC]
+    public void RpcPressButton()
+    {
+        if (isPressed) return;
+
+        isPressed = true;
+        spriteRenderer.sprite = button_pressed;
+
+        // gameManager.ExperimentCompleted = true;
+        experimentTable.CompleteExperiment();
+        Debug.Log($"🔵 Experiment Button Pressed & Synced Across Network!");
+    }
+
 }

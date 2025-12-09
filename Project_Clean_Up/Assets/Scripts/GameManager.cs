@@ -340,103 +340,103 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
         }
     }
 
-    // ⭐ 쓰레기 획득 (모든 클라이언트가 RPC로 요청하고, 마스터가 동기화)
-    public void TrashCollected(GameObject trash)
-    {
-        if (isGameOver) return;
+    // // ⭐ 쓰레기 획득 (모든 클라이언트가 RPC로 요청하고, 마스터가 동기화)
+    // public void TrashCollected(GameObject trash)
+    // {
+    //     if (isGameOver) return;
         
-        // 쓰레기 수집은 마스터 클라이언트에게만 알려서 동기화합니다.
-        PV.RPC("RpcCollectTrash", RpcTarget.MasterClient, trash.GetComponent<PhotonView>().ViewID);
-    }
+    //     // 쓰레기 수집은 마스터 클라이언트에게만 알려서 동기화합니다.
+    //     PV.RPC("RpcCollectTrash", RpcTarget.MasterClient, trash.GetComponent<PhotonView>().ViewID);
+    // }
     // ==========================================================
     // ⭐ 부품/쓰레기 수집 완료 시 버튼 활성화 체크 (마스터 클라이언트만 실행)
     // ==========================================================
-    private void CheckButtonActivation()
-    {
-        if (!PhotonNetwork.IsMasterClient || isGameOver) return;
+    // private void CheckButtonActivation()
+    // {
+    //     if (!PhotonNetwork.IsMasterClient || isGameOver) return;
 
-        // 부품 수집이 모두 완료되었을 때만 버튼 활성화
-        if (partsCollected >= totalPartCount)
-        {
-            // ⭐ 버튼 활성화 RPC는 한 번만 호출
-            if (!experimentButton.activeSelf)
-            {
-                PV.RPC("RpcActivateExperimentButton", RpcTarget.All);
-            }
-        }
-    }
+    //     // 부품 수집이 모두 완료되었을 때만 버튼 활성화
+    //     if (partsCollected >= totalPartCount)
+    //     {
+    //         // ⭐ 버튼 활성화 RPC는 한 번만 호출
+    //         if (!experimentButton.activeSelf)
+    //         {
+    //             PV.RPC("RpcActivateExperimentButton", RpcTarget.All);
+    //         }
+    //     }
+    // }
 
     // ==========================================================
     // ⭐ Experiment Complete 버튼 클릭 시 (클리어 트리거)
     // ==========================================================
     // 이 함수를 Unity Inspector에서 'experimentButton'의 OnClick() 이벤트에 연결해야 합니다.
-    public void CompleteButtonAction()
-    {
-        if (isGameOver) return;
+    // public void CompleteButtonAction()
+    // {
+    //     if (isGameOver) return;
 
-        // ⭐ 모든 클라이언트에게 게임을 클리어했음을 알리는 RPC 호출
-        PV.RPC("RpcCompleteGame", RpcTarget.All);
-    }
+    //     // ⭐ 모든 클라이언트에게 게임을 클리어했음을 알리는 RPC 호출
+    //     PV.RPC("RpcCompleteGame", RpcTarget.All);
+    // }
     
-    [PunRPC]
-    public void RpcCollectTrash(int trashViewID)
-    {
-        if (!PhotonNetwork.IsMasterClient) return;
+    // [PunRPC]
+    // public void RpcCollectTrash(int trashViewID)
+    // {
+    //     if (!PhotonNetwork.IsMasterClient) return;
 
-        trashCollected++;
+    //     trashCollected++;
 
-        PhotonView trashPV = PhotonView.Find(trashViewID);
-        if (trashPV != null)
-        {
-            PhotonNetwork.Destroy(trashPV.gameObject);
-        }
+    //     PhotonView trashPV = PhotonView.Find(trashViewID);
+    //     if (trashPV != null)
+    //     {
+    //         PhotonNetwork.Destroy(trashPV.gameObject);
+    //     }
 
-        // ⭐ 승리 조건 대신 버튼 활성화 조건 확인
-        CheckButtonActivation();
-    }
+    //     // ⭐ 승리 조건 대신 버튼 활성화 조건 확인
+    //     CheckButtonActivation();
+    // }
     
-    // ⭐ 부품 획득 (RPC 사용)
-    public void PartsCollected(GameObject part)
-    {
-        if (isGameOver) return;
-        PV.RPC("RpcCollectPart", RpcTarget.All, part.GetComponent<PhotonView>().ViewID);
-    }
+    // // ⭐ 부품 획득 (RPC 사용)
+    // public void PartsCollected(GameObject part)
+    // {
+    //     if (isGameOver) return;
+    //     PV.RPC("RpcCollectPart", RpcTarget.All, part.GetComponent<PhotonView>().ViewID);
+    // }
     
-    [PunRPC]
-    public void RpcCollectPart(int partViewID)
-    {
-        if (!PhotonNetwork.IsMasterClient) return;
+    // [PunRPC]
+    // public void RpcCollectPart(int partViewID)
+    // {
+    //     if (!PhotonNetwork.IsMasterClient) return;
         
-        partsCollected++;
+    //     partsCollected++;
 
-        PhotonView partPV = PhotonView.Find(partViewID);
-        if (partPV != null)
-        {
-            PhotonNetwork.Destroy(partPV.gameObject);
-        }
+    //     PhotonView partPV = PhotonView.Find(partViewID);
+    //     if (partPV != null)
+    //     {
+    //         PhotonNetwork.Destroy(partPV.gameObject);
+    //     }
         
-        // ⭐ 승리 조건 대신 버튼 활성화 조건 확인
-        CheckButtonActivation();
-    }
+    //     // ⭐ 승리 조건 대신 버튼 활성화 조건 확인
+    //     CheckButtonActivation();
+    // }
 
-    [PunRPC]
-    public void RpcActivateExperimentButton()
-    {
-        // 모든 클라이언트에서 버튼 활성화
-        if (experimentButton != null)
-        {
-            // 모든 수집이 완료되면 버튼을 활성화합니다.
-            experimentButton.SetActive(true);
+    // [PunRPC]
+    // public void RpcActivateExperimentButton(int ownerId)
+    // {
+    //     // 모든 클라이언트에서 버튼 활성화
+    //     if (experimentButton != null)
+    //     {
+    //         // 모든 수집이 완료되면 버튼을 활성화합니다.
+    //         experimentButton.SetActive(true);
             
-            // ⭐ 버튼이 눌리면 CompleteButtonAction()이 호출되도록 Ensure합니다.
-            Button btn = experimentButton.GetComponent<Button>();
-            if (btn != null)
-            {
-                btn.onClick.RemoveAllListeners();
-                btn.onClick.AddListener(CompleteButtonAction);
-            }
-        }
-    }
+    //         // ⭐ 버튼이 눌리면 CompleteButtonAction()이 호출되도록 Ensure합니다. (이거 진짜 버튼 아닌데)
+    //         // Button btn = experimentButton.GetComponent<Button>();
+    //         // if (btn != null)
+    //         // {
+    //         //     btn.onClick.RemoveAllListeners();
+    //         //     btn.onClick.AddListener(CompleteButtonAction);
+    //         // }
+    //     }
+    // }
 
     // ==========================================================
     // 게임 종료 로직 (RPC 사용)

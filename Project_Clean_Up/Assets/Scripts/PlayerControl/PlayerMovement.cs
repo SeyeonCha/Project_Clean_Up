@@ -94,6 +94,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
                     inputBufferTimer = inputBufferDuration; // 인풋버퍼 타이머 시작
+                    Kick();
                 }
                 else
                 {
@@ -146,7 +147,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         }
         
     }
-
+    public void Kick()
+    {
+        rb.AddForce(transform.up*1f, ForceMode2D.Impulse);
+    }
     public void KickWall()
     {
         rb.AddForce(transform.up*kickForce, ForceMode2D.Impulse);

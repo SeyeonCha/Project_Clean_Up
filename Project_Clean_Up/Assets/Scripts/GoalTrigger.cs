@@ -22,7 +22,7 @@ public class GoalTrigger : MonoBehaviour
         {
             // 닿은 오브젝트가 쓰레기 태그를 가지고 있다면,
             // GameManager에게 쓰레기가 수집되었음을 알립니다.
-            gameManager.TrashCollected(other.gameObject);
+            // gameManager.TrashCollected(other.gameObject);
         }
     }
 }
