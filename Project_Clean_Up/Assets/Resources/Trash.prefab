@@ -217,6 +217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64ee3b67c6b0bce4f88e82371bfc52cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PV: {fileID: 0}
   currentState: 0
   idleDrag: 3
   thrownDrag: 0

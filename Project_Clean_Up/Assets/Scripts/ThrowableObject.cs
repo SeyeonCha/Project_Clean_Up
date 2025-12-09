@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
+using Photon.Realtime;
+
 // 쓰레기 객체에 붙음
 public class ThrowableObject : MonoBehaviour
 {
+    public PhotonView PV;
     private int ignoreCollisionLayer = 9;
     private const int trashLayer = 7; 
 
@@ -115,8 +119,11 @@ public class ThrowableObject : MonoBehaviour
         gameObject.layer = trashLayer; // 레이어 돌려놓기
 
         // Thrown 상태일 때,
-        if (other.gameObject.CompareTag("Player"))
+        if (col.tag == "Player" && col.GetComponent<PhotonView>().IsMine)
         {
+            col.GetComponent<PlayerMovement>().Hit();
+            PV.RPC("DestroyRPC", RpcTarget.AllBuffered);
+
             // 여기!!!!!!!!!!!!!! 서 닿은 플레이어 데미지 주기!
             Debug.Log("플레이어 데미지!!");
         }
