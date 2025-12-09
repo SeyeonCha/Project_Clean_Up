@@ -9,6 +9,8 @@ using Photon.Realtime; // ✨ Photon 사용을 위해 추가
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상속 변경
 {
+    public static GameManager Instance; // 싱글톤 적용
+    
     // ====== Photon 설정 ======
     private PhotonView PV; // 이 오브젝트의 PhotonView
     
@@ -36,7 +38,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
 
     // ✨ 부품 관련 변수 추가
     public GameObject partPrefab; // ⭐ 부품 프리팹 (Inspector에서 연결)
-    public int totalPartCount = 3; // ⭐ 생성할 부품 개수 설정
+    // public int totalPartCount = 3; // ⭐ 생성할 부품 개수 설정
+    private int totalPartTypes = 4;
+    public Sprite[] partsImages; // 부품 이미지 <- 4개!
+    private int nextPartId = 0;
 
     // ⭐ Drug 관련 변수 추가
     public GameObject drugPrefab; // ⭐ Drug 프리팹 (Inspector에서 연결)
@@ -107,6 +112,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
     void Awake()
     {
         PV = GetComponent<PhotonView>();
+
+        Instance = this; // 싱글톤으로. 
     }
 
     public void StartMasterGameLogic()
@@ -190,33 +197,60 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
         }
 
         // ⭐ 생성한 인덱스들을 추적하여 중복되지 않게 합니다.
-        List<int> availableIndices = new List<int>();
+        // List<int> availableIndices = new List<int>();
         // 생성할 부품 개수만큼 인덱스 리스트를 채웁니다. (0, 1, 2, ...)
-        for (int i = 0; i < totalPartCount; i++)
-        {
-            availableIndices.Add(i);
-        }
+        // for (int i = 0; i < totalPartCount; i++)
+        // {
+        //     availableIndices.Add(i);
+        // }
         
         // 무작위 순서로 생성하고 싶다면:
         // availableIndices.Shuffle(); // (직접 구현 필요)
 
-        for (int i = 0; i < totalPartCount; i++)
+        for (nextPartId = 0; nextPartId < 2; nextPartId++) // 초기 부품 스폰 (2개)
         {
             Vector3 randomPosition = GetRandomSpawnPosition();
             
-            // 1. 부품 생성 (모든 클라이언트)
+            // 1. 부품 프리팹 생성 (모든 클라이언트)
             GameObject partObj = PhotonNetwork.Instantiate(partPrefab.name, randomPosition, Quaternion.identity);
             
             PhotonView partPV = partObj.GetComponent<PhotonView>();
             
             // 2. 현재 부품에 할당할 인덱스 결정
-            int partIndex = availableIndices[i]; // 순서대로 할당 (0, 1, 2)
+            // int partIndex = availableIndices[i]; // 순서대로 할당 (0, 1, 2)
             
             // 3. RPC를 호출하여 모든 클라이언트에게 이 부품에 어떤 이미지를 적용할지 명령
             // 인덱스를 초기화하고 동기화하기 위해 RPC를 사용합니다.
-            PV.RPC("RpcInitializePartVisuals", RpcTarget.All, partPV.ViewID, partIndex);
+            PV.RPC("RpcSetPartSprite", RpcTarget.All, partPV.ViewID, nextPartId);
         }
-        Debug.Log($"부품 {totalPartCount}개 스폰 완료 및 이미지 인덱스 할당.");
+        Debug.Log($"다음 스폰할 부품 id : {nextPartId}");
+    }
+    public void SpawnOnePart()
+    {
+        Vector3 randomPosition = GetRandomSpawnPosition();
+        GameObject partObj = PhotonNetwork.Instantiate(partPrefab.name, randomPosition, Quaternion.identity);
+        PhotonView partPV = partObj.GetComponent<PhotonView>();
+        PV.RPC("RpcSetPartSprite", RpcTarget.All, partPV.ViewID, nextPartId);
+        nextPartId = (nextPartId + 1) % 4; // 파츠 0 ~ 3 -> 0 ~ 3 반복 순회
+    }
+
+    [PunRPC]
+    void RpcSetPartSprite(int viewID, int spriteIndex)
+    {
+        PhotonView view = PhotonView.Find(viewID);
+        if (view == null) return;
+        // 스프라이트 적용
+        SpriteRenderer sr = view.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.sprite = partsImages[spriteIndex];
+        }
+        // 파츠에 아이디 부여
+        Parts part = view.GetComponent<Parts>();
+        if (part != null)
+        {
+            part.partId = spriteIndex;
+        }
     }
 
     // B. 이미지 초기화 RPC 추가
@@ -234,6 +268,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
             visuals.SetPartSprite(imageIndex);
         }
     }
+    
 
     // ==========================================================
     // ⭐ Drug 생성 로직 (마스터 클라이언트 전용)
@@ -282,9 +317,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
             // ✨ PhotonNetwork.Instantiate를 사용하여 모든 클라이언트에서 생성
             
             GameObject obj = PhotonNetwork.Instantiate(trashPrefab.name, randomPosition, Quaternion.identity);
+
+            PhotonView trashPV = obj.GetComponent<PhotonView>();
+            PV.RPC("RpcSetTrashSprite", RpcTarget.All, trashPV.ViewID, i);
             // 이미지 변경
-            SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
-            sr.sprite = trashImages[i];
+            // PhotonView trashPV = obj.GetComponent<PhotonView>();
+            // SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+            // sr.sprite = trashImages[i];
+        }
+    }
+    [PunRPC]
+    void RpcSetTrashSprite(int viewID, int spriteIndex)
+    {
+        PhotonView view = PhotonView.Find(viewID);
+        if (view == null) return;
+
+        SpriteRenderer sr = view.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.sprite = trashImages[spriteIndex];
         }
     }
 

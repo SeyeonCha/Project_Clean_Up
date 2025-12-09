@@ -11,8 +11,8 @@ public class Experiment : MonoBehaviourPun
 
     // ----- 필드
     [SerializeField]
-    private int ownerId; // 0, 1로 설정해두기
-    public int requiredParts = 3; // 해당 실험대가 필요로 하는 총 파츠 개수
+    // private int ownerId; // 0, 1로 설정해두기
+    public int requiredParts = 4; // 해당 실험대가 필요로 하는 총 파츠 개수
     public GameObject experimentButton; // 이 실험대의 완성버튼
 
     public CompletingMonster monster;
@@ -21,6 +21,8 @@ public class Experiment : MonoBehaviourPun
 
     private enum TableState {collecting, completed} // 각 실험대의 상태
     private TableState state = TableState.collecting;
+
+    public HashSet<int> collectedPartIds = new HashSet<int>();
 
     void Start()
     {
@@ -48,44 +50,59 @@ public class Experiment : MonoBehaviourPun
         if (!gameManager.IsGameActive()) return;
 
         Parts p = other.gameObject.GetComponent<Parts>();
-        if (p!= null && p.ownerId == ownerId)
+        if (p!= null)
         {
-            Debug.Log($"[Experiment {ownerId}] Correct part collected!");
+            Debug.Log($"part collected!");
             // gameManager.PartsCollected(other.gameObject);
-            photonView.RPC("RpcCollectPart", RpcTarget.MasterClient, other.GetComponent<PhotonView>().ViewID);
+            photonView.RPC("RpcCollectPart", RpcTarget.MasterClient, other.GetComponent<PhotonView>().ViewID, p.partId);
         }
-        else{
-            Debug.Log($"[Experiment {ownerId}] Wrong part!");
-        }
+        
         
     }
 
     [PunRPC]
-    public void RpcCollectPart(int partViewID)
+    public void RpcCollectPart(int partViewID, int partId)
     {
         if (!PhotonNetwork.IsMasterClient) return;
         if (!gameManager.IsGameActive()) return;
-
-        // 수집 파츠 개수 +1
-        partsCollected++; 
         
-        // 등록된 파츠 파괴 & 동기화
-        PhotonView partPV = PhotonView.Find(partViewID);
-        if (partPV != null) PhotonNetwork.Destroy(partPV.gameObject);
-
-        Debug.Log($"[Experiment {ownerId}] {partsCollected}/3 parts collected");
-
-        if (partsCollected >= requiredParts)
+        if (collectedPartIds.Add(partId))
         {
-            photonView.RPC("RpcActivateButton", RpcTarget.All);
+            Debug.Log($"[Experiment] 파츠 {partId} 수집됨 (Unique count: {collectedPartIds.Count})");
+
+            PhotonView PV = PhotonView.Find(partViewID);
+            if (PV != null) PhotonNetwork.Destroy(PV.gameObject);
+            gameManager.SpawnOnePart();
+
+            if (collectedPartIds.Count >= requiredParts)
+            {
+                photonView.RPC("RpcActivateButton", RpcTarget.All);
+            }
         }
+        else
+        {
+            Debug.Log($"[Experiment] 파츠 {partId}는 이미 있음 → 무시");
+        }
+        // // 수집 파츠 개수 +1
+        // partsCollected++; 
+        
+        // // 등록된 파츠 파괴 & 동기화
+        // PhotonView partPV = PhotonView.Find(partViewID);
+        // if (partPV != null) PhotonNetwork.Destroy(partPV.gameObject);
+
+        // Debug.Log($"[Experiment {ownerId}] {partsCollected}/3 parts collected");
+
+        // if (partsCollected >= requiredParts)
+        // {
+        //     photonView.RPC("RpcActivateButton", RpcTarget.All);
+        // }
         
     }
 
     [PunRPC]
     public void RpcActivateButton()
     {
-        Debug.Log($"Experiment {ownerId} completed! Button active");
+        // Debug.Log($"Experiment {ownerId} completed! Button active");
         // 모든 클라이언트에서 버튼 활성화
         if (experimentButton != null)
         {
@@ -103,7 +120,7 @@ public class Experiment : MonoBehaviourPun
     {
         state = TableState.completed;
         monster.MonsterGenerate();
-        Debug.Log($"🧪 Experiment {ownerId} Completed & Monster Spawned (Synced)");
+        // Debug.Log($"🧪 Experiment {ownerId} Completed & Monster Spawned (Synced)");
     }
 
 
