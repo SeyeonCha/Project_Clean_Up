@@ -26,12 +26,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         PhotonNetwork.LocalPlayer.NickName = NickNameInput.text;
-        PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions { MaxPlayers = 6 }, null);
+        PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions { MaxPlayers = 2 }, null);
     }
 
     public override void OnJoinedRoom()
     {
         DisconnectPanel.SetActive(false);
+        //StartCoroutine("DestroyParts");
         Spawn();
 
         GameManager gm = FindObjectOfType<GameManager>();
@@ -41,15 +42,21 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape) && PhotonNetwork.IsConnected) PhotonNetwork.Disconnect();
-    }
+    // IEnumerator DestroyParts()
+    // {
+    //     yield return new WaitForSeconds(0.2f);
+    //     foreach (GameObject GO in GameObject.FindGameObjectsWithTag("Trash")) GO.GetComponent<PhotonView>().RPC("DestroyRPC", RpcTarget.All);
+    // }
 
     public void Spawn()
     {
         PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
         RespawnPanel.SetActive(false);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape) && PhotonNetwork.IsConnected) PhotonNetwork.Disconnect();
     }
 
     public override void OnDisconnected(DisconnectCause cause)

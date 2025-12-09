@@ -19,7 +19,7 @@ public class Experiment : MonoBehaviourPun
 
     private CompletingMonster monster;
 
-    private int partsCollected = 0; // 각 실험대가 모은 파츠 개수 저장. 
+    // private int partsCollected = 0; // 각 실험대가 모은 파츠 개수 저장. 
 
     private enum TableState {collecting, completed} // 각 실험대의 상태
     private TableState state = TableState.collecting;

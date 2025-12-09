@@ -18,22 +18,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     Vector3 curPos;
     Quaternion curRot;
     
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(transform.position);
-            stream.SendNext(transform.rotation);
-        }
-        else
-        {
-            CurPos = (Vector3)stream.ReceiveNext();
-            curRot = (Quaternion)stream.ReceiveNext();
-        }
-    }
     private GameManager gameManager; // 게임 매니저 참조
     
-    //private Rigidbody2D rb; 
+    // private Rigidbody2D rb; 
 
     // 발차기 관련 변수들
     private bool isTouchingWall = false;
@@ -145,12 +132,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
                 rb.angularVelocity = 0f;
             }
         }
-        
     }
+
+    // 🔥🔥
     public void Kick()
     {
         rb.AddForce(transform.up*1f, ForceMode2D.Impulse);
     }
+    // 🔥🔥
+
     public void KickWall()
     {
         rb.AddForce(transform.up*kickForce, ForceMode2D.Impulse);
@@ -185,9 +175,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
             {
                 rb.velocity = new Vector2(rb.velocity.x*-0.1f,rb.velocity.y*-0.1f);
             }
-            
         }
     }
+
     void OnCollisionStay2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Wall"))
@@ -234,8 +224,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         Debug.Log("부스트 시작");
 
         StartCoroutine(BoostTimer());
-
     }
+
     IEnumerator BoostTimer()
     {
         // 부스트 종료 시간까지 대기
@@ -264,4 +254,19 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     void DestroyRPC() => Destroy(gameObject);
 
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(transform.position);
+            stream.SendNext(transform.rotation);
+            stream.SendNext(HealthImage.fillAmount);
+        }
+        else
+        {
+            CurPos = (Vector3)stream.ReceiveNext();
+            curRot = (Quaternion)stream.ReceiveNext();
+            HealthImage.fillAmount = (float)stream.ReceiveNext();
+        }
+    }
 }

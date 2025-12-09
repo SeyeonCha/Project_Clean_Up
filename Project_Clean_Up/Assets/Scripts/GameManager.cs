@@ -4,10 +4,10 @@ using UnityEngine.SceneManagement;
 using TMPro; 
 using System.Collections;
 using System.Collections.Generic;
-using Photon.Pun; // ✨ Photon 사용을 위해 추가
-using Photon.Realtime; // ✨ Photon 사용을 위해 추가
+using Photon.Pun;
+using Photon.Realtime;
 
-public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상속 변경
+public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
     public static GameManager Instance; // 싱글톤 적용
     
@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
     
     // ====== UI 및 메세지 설정 ======
     public TextMeshProUGUI timeText;
-    public TextMeshProUGUI remainingText; 
+    // public TextMeshProUGUI remainingText; 
     public TextMeshProUGUI endText; 
     public GameObject retryButton;
     public GameObject retryPanel;
@@ -27,28 +27,26 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
 
     // ====== 게임 시간 설정 (동기화 대상) ======
     public float startingTime = 60f;
-    private float currentTime; // ✨ 동기화 대상
-    private bool isGameOver = false; // ✨ 동기화 대상
+    private float currentTime;
+    private bool isGameOver = false;
 
-    // ====== 쓰레기 및 클리어 조건 설정 (동기화 대상) ======
+    // 무기 관련 변수
     [Header("Trash & Spawning")]
     public GameObject trashPrefab;
     public int totalTrashCount = 5;
     public Sprite[] trashImages; // 공격체의 이미지들 <- 인스펙터
 
-    // ✨ 부품 관련 변수 추가
-    public GameObject partPrefab; // ⭐ 부품 프리팹 (Inspector에서 연결)
-    // public int totalPartCount = 3; // ⭐ 생성할 부품 개수 설정
-    private int totalPartTypes = 4;
+    // 부품 관련 변수
+    public GameObject partPrefab; // 부품 프리팹 (Inspector에서 연결)
+    // private int totalPartTypes = 4;
     public Sprite[] partsImages; // 부품 이미지 <- 4개!
     private int nextPartId = 0;
 
-    // ⭐ Drug 관련 변수 추가
-    public GameObject drugPrefab; // ⭐ Drug 프리팹 (Inspector에서 연결)
-    public int totalDrugCount = 2; // ⭐ 생성할 Drug 개수 설정
-    // ⭐ Drug 색상 배열 추가
+    // Drug 관련 변수
+    public GameObject drugPrefab; // Drug 프리팹 (Inspector에서 연결)
+    public int totalDrugCount = 2; // 생성할 Drug 개수 설정
     [Header("Drug Visuals")]
-    public Color[] drugColorsForSpawning; // ⭐ GameManager에서 설정할 색상 배열
+    public Color[] drugColorsForSpawning;
 
     [System.Serializable]
     public struct BoostSetting
@@ -61,19 +59,20 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
     [Header("Drug Boost Settings")]
     public BoostSetting[] drugBoostSettings;
 
-    // ⭐ 장애물 관련 변수 추가
-    public GameObject obstaclePrefab; // ⭐ 장애물 프리팹 (Inspector에서 연결)
-    public int totalObstacleCount = 2; // ⭐ 생성할 장애물 개수 설정
+    // 장애물 관련 변수
+    public GameObject obstaclePrefab; // 장애물 프리팹 (Inspector에서 연결)
+    public int totalObstacleCount = 2; // 생성할 장애물 개수 설정
 
     public Bounds mapBounds = new Bounds(Vector3.zero, new Vector3(20, 10, 0));
     
     // ✨ 동기화 대상
-    private int trashCollected = 0; 
-    private int partsCollected = 0;
+    // private int trashCollected = 0; 
+    //private int partsCollected = 0;
     public bool ExperimentCompleted = false;
 
     public GameObject experimentButton;
 
+    // 폭탄 관련 변수
     [Header("Bomb Spawning")]
     public GameObject bombPrefab;           
     public float minBombSpawnTime = 10f;     
@@ -91,7 +90,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
         {
             // 🚀 마스터 클라이언트만 전송
             stream.SendNext(currentTime);
-            stream.SendNext(trashCollected);
+            //stream.SendNext(trashCollected);
             stream.SendNext(isGameOver);
             stream.SendNext(bombsSpawned);
         }
@@ -99,7 +98,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
         {
             // 📥 다른 클라이언트들은 수신
             currentTime = (float)stream.ReceiveNext();
-            trashCollected = (int)stream.ReceiveNext();
+            //trashCollected = (int)stream.ReceiveNext();
             isGameOver = (bool)stream.ReceiveNext();
             bombsSpawned = (int)stream.ReceiveNext();
         }
@@ -112,7 +111,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
     void Awake()
     {
         PV = GetComponent<PhotonView>();
-
         Instance = this; // 싱글톤으로. 
     }
 
@@ -120,6 +118,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
     {
         if (PhotonNetwork.IsMasterClient)
         {
+            // 🔥🔥
             Experiment[] tables = FindObjectsOfType<Experiment>();
             Player[] players = PhotonNetwork.PlayerList;
             int count = Mathf.Min(tables.Length, players.Length);
@@ -129,8 +128,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
                 int actorNumber = players[i].ActorNumber;
                 tables[i].SetOwner(actorNumber); // 실험대에 플레이어 owner 설정
             }
+            // 🔥🔥
             
-            SpawnTrashObjects();
+            SpawnWeaponObjects();
             SpawnPartObjects();
             SpawnObstacleObjects();
             SpawnDrugObjects();
@@ -143,20 +143,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
         currentTime = startingTime;
 
         if (retryPanel != null) { retryPanel.SetActive(false); }
-        
-        // ✨ 쓰레기 스폰: 마스터 클라이언트만 객체 스폰 로직을 실행합니다.
-        // if (PhotonNetwork.IsMasterClient)
-        // {
-        //     SpawnTrashObjects();
-        //     StartCoroutine(SpawnBombsRoutine());
-        // }
 
-        UpdateRemainingText(); // 초기 UI 업데이트
+        // UpdateRemainingText(); // 초기 UI 업데이트
     }
 
     void Update()
     {
-        // ✨ 마스터 클라이언트만 시간 감소 로직을 수행합니다.
+        // 마스터 클라이언트만 시간 감소 로직을 수행
         if (PhotonNetwork.IsMasterClient && !isGameOver)
         {
             currentTime -= Time.deltaTime;
@@ -171,12 +164,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
         
         // 모든 클라이언트에서 UI 업데이트
         UpdateUIText();
-        UpdateRemainingText();
+        // UpdateRemainingText();
     }
 
     // ==========================================================
-    // ⭐ Obstacle 생성 로직 (마스터 클라이언트 전용)
+    // ⭐ 장애물/부품/Drug/무기/폭탄 로직 (RPC 사용)
     // ==========================================================
+
+    // Obstacle 생성 로직 (마스터 클라이언트 전용)
     private void SpawnObstacleObjects()
     {
         if (!PhotonNetwork.IsMasterClient || obstaclePrefab == null)
@@ -188,16 +183,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
         for (int i = 0; i < totalObstacleCount; i++)
         {
             Vector3 randomPosition = GetRandomSpawnPosition();
-            
-            // PhotonNetwork.Instantiate를 사용하여 모든 클라이언트에서 장애물 생성
             PhotonNetwork.Instantiate(obstaclePrefab.name, randomPosition, Quaternion.identity);
         }
         Debug.Log($"장애물 {totalObstacleCount}개 스폰 완료.");
     }
 
-    // ==========================================================
-    // ⭐ 부품/쓰레기/폭탄 생성 로직 (마스터 클라이언트 전용)
-    // ==========================================================
+    // 🔥🔥
+    // 부품 생성 로직 (마스터 클라이언트 전용)
     private void SpawnPartObjects()
     {
         if (!PhotonNetwork.IsMasterClient || partPrefab == null)
@@ -213,9 +205,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
         // {
         //     availableIndices.Add(i);
         // }
-        
-        // 무작위 순서로 생성하고 싶다면:
-        // availableIndices.Shuffle(); // (직접 구현 필요)
 
         for (nextPartId = 0; nextPartId < 2; nextPartId++) // 초기 부품 스폰 (2개)
         {
@@ -278,10 +267,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
             visuals.SetPartSprite(imageIndex);
         }
     }
+    // 🔥🔥
     
-    // ==========================================================
-    // ⭐ Drug 생성 로직 (마스터 클라이언트 전용)
-    // ==========================================================
+    // Drug 생성 로직 (마스터 클라이언트 전용)
     private void SpawnDrugObjects()
     {
         if (!PhotonNetwork.IsMasterClient || drugPrefab == null)
@@ -291,7 +279,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
         }
         
         int settingsCount = drugBoostSettings.Length;
-        int colorCount = drugColorsForSpawning.Length; // ✨ 색상 배열 크기
+        int colorCount = drugColorsForSpawning.Length; // 색상 배열 크기
 
         for (int i = 0; i < totalDrugCount; i++)
         {
@@ -303,19 +291,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
             GameObject drugObj = PhotonNetwork.Instantiate(drugPrefab.name, randomPosition, Quaternion.identity);
             
             BoostSetting setting = drugBoostSettings[i];
-            Color itemColor = drugColorsForSpawning[i]; // ✨ 해당 인덱스의 색상 가져오기
+            Color itemColor = drugColorsForSpawning[i]; // 해당 인덱스의 색상 가져오기
             
             Booster booster = drugObj.GetComponent<Booster>();
             if (booster != null)
             {
-                // ✨ 수정된 초기화 함수 호출: 색상 정보 포함
                 booster.InitializeBoostAndColor(setting.rotationBoost, setting.speedBoost, setting.duration, itemColor);
             }
         }
         Debug.Log($"Drug {totalDrugCount}개 스폰 완료 및 색상/부스트 설정 할당.");
     }
 
-    private void SpawnTrashObjects() // 쓰레기 스폰 함수
+    // 무기 생성 로직
+    private void SpawnWeaponObjects()
     {
         if (!PhotonNetwork.IsMasterClient || trashPrefab == null) return;
 
@@ -323,10 +311,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
         {
             Vector3 randomPosition = GetRandomSpawnPosition();
             
-            // ✨ PhotonNetwork.Instantiate를 사용하여 모든 클라이언트에서 생성
-            
+            // PhotonNetwork.Instantiate를 사용하여 모든 클라이언트에서 생성
             GameObject obj = PhotonNetwork.Instantiate(trashPrefab.name, randomPosition, Quaternion.identity);
 
+            // 🔥🔥
             PhotonView trashPV = obj.GetComponent<PhotonView>();
             PV.RPC("RpcSetTrashSprite", RpcTarget.All, trashPV.ViewID, i);
             // 이미지 변경
@@ -347,7 +335,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
             sr.sprite = trashImages[spriteIndex];
         }
     }
+    // 🔥🔥
 
+    // 폭탄 생성 로직
     private IEnumerator SpawnBombsRoutine()
     {
         if (!PhotonNetwork.IsMasterClient || bombPrefab == null) yield break;
@@ -391,15 +381,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
         }
     }
     
-    void UpdateRemainingText()
-    {
-        // 수집된 쓰레기 개수는 Network Serialize View를 통해 동기화됨
-        if (remainingText != null)
-        {
-            remainingText.text = $"Remaining: {trashCollected}/{totalTrashCount}";
-        }
-    }
+    // void UpdateRemainingText()
+    // {
+    //     // 수집된 쓰레기 개수는 Network Serialize View를 통해 동기화됨
+    //     if (remainingText != null)
+    //     {
+    //         remainingText.text = $"Remaining: {trashCollected}/{totalTrashCount}";
+    //     }
+    // }
 
+    // 🔥🔥
     // // ⭐ 쓰레기 획득 (모든 클라이언트가 RPC로 요청하고, 마스터가 동기화)
     // public void TrashCollected(GameObject trash)
     // {
@@ -488,7 +479,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
     //         // 모든 수집이 완료되면 버튼을 활성화합니다.
     //         experimentButton.SetActive(true);
             
-    //         // ⭐ 버튼이 눌리면 CompleteButtonAction()이 호출되도록 Ensure합니다. (이거 진짜 버튼 아닌데)
+    //         // ⭐ 버튼이 눌리면 CompleteButtonAction()이 호출되도록 Ensure합니다.
     //         // Button btn = experimentButton.GetComponent<Button>();
     //         // if (btn != null)
     //         // {
@@ -497,6 +488,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상�
     //         // }
     //     }
     // }
+    // 🔥🔥
 
     // ==========================================================
     // 게임 종료 로직 (RPC 사용)
