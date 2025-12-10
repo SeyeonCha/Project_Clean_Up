@@ -136,7 +136,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         CreateRoomPanel.SetActive(false);
         instructionText.text = $"Creating room '{roomName}'...";
         
-        PhotonNetwork.CreateRoom(roomName, new RoomOptions { MaxPlayers = 6 }, null);
+        PhotonNetwork.CreateRoom(roomName, new RoomOptions { MaxPlayers = MAX_PLAYERS }, null);
     }
 
     // Confirm 버튼 (SearchRoomPanel)
