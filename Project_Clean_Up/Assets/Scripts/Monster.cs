@@ -51,15 +51,18 @@ public class Monster : MonoBehaviourPun
     {
         PhotonView myPV = GetComponent<PhotonView>();
 
-        // 로컬플레이어의 ActorNumber 가 이 실험대의 주인이 아니면
-        if (PhotonNetwork.LocalPlayer.ActorNumber != attackerOwnerId)
-        {
-            col.GetComponent<PlayerMovement>().Hit();
-            PV.RPC("DestroyRPC", RpcTarget.AllBuffered);
-            // 여기!!!!!!!!!!!!! "내(로컬 플레이어) 데미지 감소!"
+        col.GetComponent<PlayerMovement>().Hit();
+        PV.RPC("DestroyRPC", RpcTarget.AllBuffered);
+
+        // // 로컬플레이어의 ActorNumber 가 이 실험대의 주인이 아니면
+        // if (PhotonNetwork.LocalPlayer.ActorNumber != attackerOwnerId)
+        // {
+        //     col.GetComponent<PlayerMovement>().Hit();
+        //     PV.RPC("DestroyRPC", RpcTarget.AllBuffered);
+        //     // 여기!!!!!!!!!!!!! "내(로컬 플레이어) 데미지 감소!"
             
-            Debug.Log("------ 내 데미지 감소 ------");
-        }
+        //     Debug.Log("------ 내 데미지 감소 ------");
+        // }
     }
 
     // void OnTriggerEnter2D(Collider2D col)

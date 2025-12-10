@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun; // ✨ 추가
+using Photon.Pun;
 using Photon.Realtime;
 
 public class FloatingMove : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상속 변경
