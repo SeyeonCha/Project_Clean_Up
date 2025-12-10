@@ -168,11 +168,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c72145b0d4f9b647943230764573b1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
+  rb: {fileID: 6202146087743806893}
   SR: {fileID: 6978899534021309193}
   PV: {fileID: 5952329421163584506}
   NickNameText: {fileID: 3124736888385603417}
-  HealthImage: {fileID: 0}
+  HealthImage: {fileID: 2999230051155008019}
   kickForce: 5
   rotationSpeed: 300
   coyoteTimeDuration: 0.3

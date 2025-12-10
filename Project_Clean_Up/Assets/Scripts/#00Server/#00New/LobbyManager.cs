@@ -35,7 +35,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public Button exitButton;
     public Button readyButton;
     public Button startButton;
-    // ... (Player UIs 변수들 유지) ...
     public GameObject playerUI_1; 
     public TMP_Text nicknameText_1;
     public TMP_Text readyStateText_1;
@@ -49,6 +48,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     private bool isReady = false; 
     private Coroutine countdownCoroutine;
     private const int START_COUNTDOWN_TIME = 10;
+
+    [Header("Scene Settings")]
+    public string gameSceneName = "GameScene";
     private PhotonView PV;
 
     // ==========================================================
@@ -57,6 +59,12 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        if (!PhotonNetwork.AutomaticallySyncScene)
+        {
+            PhotonNetwork.AutomaticallySyncScene = true;
+            Debug.Log("PhotonNetwork.AutomaticallySyncScene set to TRUE.");
+        }
+
         PV = GetComponent<PhotonView>();
         if (PV == null)
         {
@@ -363,11 +371,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             // 모든 클라이언트에게 게임 시작 메시지 알림
             PV.RPC("RpcNotifyGameStart", RpcTarget.All);
 
-            // ⭐ 다음 씬으로 전환하는 로직 (예: GameScene)
-            // PhotonNetwork.LoadLevel("GameScene");
-            
-            // 임시: 씬 로드 대신 성공 메시지 표시
-            Debug.Log("Game Start Triggered!"); 
+            // PhotonNetwork.LoadLevel 호출
+            PhotonNetwork.LoadLevel(gameSceneName);
         }
         
         countdownCoroutine = null;
