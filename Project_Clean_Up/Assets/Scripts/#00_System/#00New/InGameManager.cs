@@ -38,6 +38,11 @@ public class InGameManager : MonoBehaviourPunCallbacks, IPunObservable
     public GameObject playerPrefab; // 플레이어 프리팹 (Inspector에서 연결)
     public Vector3 ownerSpawnPoint = new Vector3(-5f, 0f, 0f); // Master Client 스폰 위치
     public Vector3 player2SpawnPoint = new Vector3(5f, 0f, 0f); // Player 2 스폰 위치
+
+    [Header("Experiment Desk Settings")]
+    public GameObject experimentDeskPrefab; // ExperimentDesk 프리팹 (Inspector 연결 필수)
+    public Vector3 ownerDeskSpawnPoint = new Vector3(-8f, -4f, 0f); // Master Client Desk 스폰 위치
+    public Vector3 player2DeskSpawnPoint = new Vector3(8f, -4f, 0f); // Player 2 Desk 스폰 위치
     
     // ==========================================================
     // ⭐ 오브젝트 생성 설정 (기존 GameManager 참고)
@@ -50,6 +55,12 @@ public class InGameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public int totalTrashCount = 5;
     public int totalDrugCount = 2; 
+
+    // ⭐ 파츠 (Parts) 관련 변수 추가 ⭐
+    [Header("Parts Spawning")]
+    public GameObject partPrefab;   // 부품 프리팹 (Inspector 연결 필수)
+    public Sprite[] partsImages;    // 부품 이미지 (총 4개, Inspector 연결 필수)
+    public int totalPartTypes = 4; // ⭐ 수정: 파츠 종류의 총 개수 (4)
     
     // ⭐ Drug 관련 세부 설정 (GameManager에서 통합됨)
     [System.Serializable]
@@ -85,6 +96,11 @@ public class InGameManager : MonoBehaviourPunCallbacks, IPunObservable
     private int bombsSpawned = 0; // 마스터 클라이언트만 제어
     private Coroutine countdownCoroutine;
     private bool isPaused = false;
+
+    private int nextPartIdToSpawn = 0;   // ⭐ 다음 생성할 파츠 종류 ID (0 ~ 3 순환)
+    private int totalPartsSpawned = 0;   // ⭐ 총 생성된 파츠 개수 (최대 8개)
+    private const int MAX_PARTS_IN_GAME = 8; // ⭐ 게임당 최대 생성 개수 (4 종류 * 2회)
+    private const int INITIAL_SPAWN_COUNT = 2; // ⭐ 시작 시 생성할 초기 개수
     
     private const string READY_KEY = "IsReadyForGame"; 
     private const int GAME_START_COUNTDOWN = 5;
@@ -126,6 +142,7 @@ public class InGameManager : MonoBehaviourPunCallbacks, IPunObservable
             SpawnWeaponObjects();
             SpawnObstacleObjects();
             SpawnDrugObjects();
+            SpawnPartObjects();
             StartCoroutine(SpawnBombsRoutine());
         }
     }
@@ -303,6 +320,12 @@ public class InGameManager : MonoBehaviourPunCallbacks, IPunObservable
 
         // 플레이어 스폰
         SpawnPlayer();
+
+        // ⭐ Desk 생성 추가 (Master Client만 실행)
+        if (PhotonNetwork.IsMasterClient)
+        {
+            SpawnExperimentDesks(); // Desk 생성 호출
+        }
         
         // 마스터 클라이언트만 게임 오브젝트 생성 로직 시작
         if (PhotonNetwork.IsMasterClient)
@@ -318,12 +341,14 @@ public class InGameManager : MonoBehaviourPunCallbacks, IPunObservable
     private void SpawnPlayer()
     {
         Vector3 spawnPosition;
-        
-        // 액터 넘버가 1인 플레이어가 Master Client입니다.
+    
+        // ⭐ 현재 로컬 플레이어의 역할에 따라 스폰 위치 결정
+        // Master Client
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             spawnPosition = ownerSpawnPoint;
         }
+        // Player 2 (Client)
         else
         {
             spawnPosition = player2SpawnPoint;
@@ -331,13 +356,63 @@ public class InGameManager : MonoBehaviourPunCallbacks, IPunObservable
 
         if (playerPrefab != null)
         {
-            // NetworkManager의 Spawn() 로직을 대체
+            // ⭐ 핵심: 모든 클라이언트가 이 코드를 실행하면,
+            // PhotonNetwork.Instantiate는 해당 클라이언트의 소유권(IsMine=True)을 가진
+            // 캐릭터를 생성하고 다른 클라이언트에게 동기화합니다.
             PhotonNetwork.Instantiate(playerPrefab.name, spawnPosition, Quaternion.identity);
-            Debug.Log($"Player spawned at: {spawnPosition}");
+            Debug.Log($"Player spawned at: {spawnPosition}. Owner: {PhotonNetwork.LocalPlayer.NickName}");
         }
         else
         {
             Debug.LogError("Player Prefab이 InGameManager에 연결되지 않았습니다!");
+        }
+    }
+
+    // ⭐ Desk 생성 함수 추가 (Master Client만 실행)
+    private void SpawnExperimentDesks()
+    {
+        // ⭐ Master Client만 생성합니다.
+        if (!PhotonNetwork.IsMasterClient || experimentDeskPrefab == null)
+        {
+            if (experimentDeskPrefab == null) Debug.LogError("Experiment Desk Prefab이 InGameManager에 연결되지 않았습니다!");
+            return;
+        }
+
+        // 1. Master Client Desk 생성
+        GameObject ownerDeskObj = PhotonNetwork.Instantiate(experimentDeskPrefab.name, ownerDeskSpawnPoint, Quaternion.identity);
+        Experiment ownerDesk = ownerDeskObj.GetComponent<Experiment>();
+        if (ownerDesk != null)
+        {
+            // Master Client (LocalPlayer)에게 소유권 설정
+            ownerDesk.SetOwner(PhotonNetwork.LocalPlayer); 
+        }
+
+        // 2. Player 2 찾기
+        Player player2 = null;
+        foreach(Player p in PhotonNetwork.PlayerList)
+        {
+            if (!p.IsMasterClient)
+            {
+                player2 = p;
+                break;
+            }
+        }
+        
+        // 3. Player 2 Desk 생성
+        if (player2 != null)
+        {
+            GameObject player2DeskObj = PhotonNetwork.Instantiate(experimentDeskPrefab.name, player2DeskSpawnPoint, Quaternion.identity);
+            Experiment player2Desk = player2DeskObj.GetComponent<Experiment>();
+            if (player2Desk != null)
+            {
+                // Player 2에게 소유권 설정
+                player2Desk.SetOwner(player2); 
+                Debug.Log($"Desk for Player 2 created.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Player 2가 없어 Desk가 생성되지 않았습니다.");
         }
     }
 
@@ -414,6 +489,106 @@ public class InGameManager : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
         Debug.Log($"Drug {totalDrugCount}개 스폰 완료 및 색상/부스트 설정 할당.");
+    }
+
+    // ==========================================================
+    // ⭐ Part 생성 로직 (Master Client Only)
+    // ==========================================================
+
+    private void SpawnPartObjects()
+    {
+        if (!PhotonNetwork.IsMasterClient || partPrefab == null)
+        {
+            if (partPrefab == null) Debug.LogError("Part Prefab이 InGameManager에 연결되지 않았습니다!");
+            return;
+        }
+        
+        // ⭐ 1. 초기 2개의 파츠만 생성합니다.
+        for (int i = 0; i < INITIAL_SPAWN_COUNT; i++)
+        {
+            Vector3 randomPosition = GetRandomSpawnPosition();
+            
+            GameObject partObj = PhotonNetwork.Instantiate(partPrefab.name, randomPosition, Quaternion.identity);
+            
+            PhotonView partPV = partObj.GetComponent<PhotonView>();
+            
+            if (partPV != null)
+            {
+                // 현재 파츠 ID (0 또는 1)
+                int partIndex = i; 
+                
+                PV.RPC("RpcSetPartVisualsAndId", RpcTarget.All, partPV.ViewID, partIndex);
+            }
+        }
+        
+        // ⭐ 2. 카운터 업데이트: 2개 생성되었으므로, 다음 생성할 ID는 2, 총 생성 개수는 2입니다.
+        nextPartIdToSpawn = INITIAL_SPAWN_COUNT % totalPartTypes; // 2 % 4 = 2
+        totalPartsSpawned = INITIAL_SPAWN_COUNT; 
+
+        Debug.Log($"Parts {INITIAL_SPAWN_COUNT}개 초기 스폰 완료.");
+    }
+
+    // ==========================================================
+    // ⭐ Part 동기화 RPC
+    // ==========================================================
+
+    [PunRPC]
+    void RpcSetPartVisualsAndId(int viewID, int spriteIndex)
+    {
+        PhotonView view = PhotonView.Find(viewID);
+        if (view == null) return;
+        
+        // 1. Parts.cs 컴포넌트를 가져옵니다.
+        Parts part = view.GetComponent<Parts>(); 
+        
+        if (part != null)
+        {
+            // 2. Parts.cs의 공개 함수를 호출하여 Sprite를 설정합니다.
+            part.SetPartSprite(spriteIndex); 
+            
+            // 3. Parts.cs의 public 변수에 ID를 할당합니다.
+            part.partId = spriteIndex;
+        }
+        else
+        {
+            Debug.LogError($"Part Prefab에 Parts.cs 컴포넌트가 없습니다! ViewID: {viewID}");
+        }
+    }
+
+    // ⭐ 파츠가 수집되어 파괴될 때 Experiment.cs에서 이 함수를 호출합니다.
+    public void PartCollected()
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        // ⭐ 1. 총 생성 한도(8개)를 초과했는지 확인합니다.
+        if (totalPartsSpawned < MAX_PARTS_IN_GAME)
+        {
+            SpawnOnePart(); // 다음 순번의 파츠 1개 생성
+        }
+        else
+        {
+            Debug.Log("모든 파츠(총 8개)가 이미 생성되었습니다.");
+        }
+    }
+    
+    public void SpawnOnePart()
+    {
+        if (!PhotonNetwork.IsMasterClient || partPrefab == null) return;
+        
+        Vector3 randomPosition = GetRandomSpawnPosition();
+        GameObject partObj = PhotonNetwork.Instantiate(partPrefab.name, randomPosition, Quaternion.identity);
+        
+        PhotonView partPV = partObj.GetComponent<PhotonView>();
+        
+        if (partPV != null)
+        {
+            // 1. 현재 순번의 파츠 ID를 RPC로 전송
+            PV.RPC("RpcSetPartVisualsAndId", RpcTarget.All, partPV.ViewID, nextPartIdToSpawn);
+            
+            // 2. 카운터 업데이트
+            nextPartIdToSpawn = (nextPartIdToSpawn + 1) % totalPartTypes; // 다음 종류 ID 순환 (0~3)
+            totalPartsSpawned++; // 총 생성 개수 증가
+        }
     }
 
     // 폭탄 생성 로직

@@ -126,7 +126,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             for (int i = 0; i < count; i++)
             {
                 int actorNumber = players[i].ActorNumber;
-                tables[i].SetOwner(actorNumber); // 실험대에 플레이어 owner 설정
+                // tables[i].SetOwner(actorNumber); // 실험대에 플레이어 owner 설정
             }
             // 🔥🔥
             
@@ -252,21 +252,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    // B. 이미지 초기화 RPC 추가
-    [PunRPC]
-    private void RpcInitializePartVisuals(int partViewID, int imageIndex)
-    {
-        PhotonView partPV = PhotonView.Find(partViewID);
-        if (partPV == null) return;
+    // // B. 이미지 초기화 RPC 추가
+    // [PunRPC]
+    // private void RpcInitializePartVisuals(int partViewID, int imageIndex)
+    // {
+    //     PhotonView partPV = PhotonView.Find(partViewID);
+    //     if (partPV == null) return;
         
-        PartVisuals visuals = partPV.GetComponent<PartVisuals>();
+    //     PartVisuals visuals = partPV.GetComponent<PartVisuals>();
         
-        if (visuals != null)
-        {
-            // 모든 클라이언트에서 수신된 인덱스로 스프라이트를 설정합니다.
-            visuals.SetPartSprite(imageIndex);
-        }
-    }
+    //     if (visuals != null)
+    //     {
+    //         // 모든 클라이언트에서 수신된 인덱스로 스프라이트를 설정합니다.
+    //         visuals.SetPartSprite(imageIndex);
+    //     }
+    // }
     // 🔥🔥
     
     // Drug 생성 로직 (마스터 클라이언트 전용)

@@ -143,11 +143,11 @@ GameObject:
   m_Component:
   - component: {fileID: 2602317006490920665}
   - component: {fileID: 3180646132925859162}
-  - component: {fileID: 1394759105471802648}
   - component: {fileID: 8580972294649027003}
   - component: {fileID: 4676757251681354584}
-  - component: {fileID: 5015601944285937069}
   - component: {fileID: 439891529737450844}
+  - component: {fileID: 2546959405791354825}
+  - component: {fileID: 8960614939132145928}
   m_Layer: 0
   m_Name: ExperimentDesk
   m_TagString: Untagged
@@ -226,21 +226,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1394759105471802648
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1555056749311277690}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a606fe108a518034fa692e9886650a99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ownerId: 0
-  requiredParts: 4
-  experimentButton: {fileID: 2511417411882366507}
 --- !u!50 &8580972294649027003
 Rigidbody2D:
   serializedVersion: 4
@@ -313,22 +298,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.97, y: 1.76}
   m_EdgeRadius: 0
---- !u!114 &5015601944285937069
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1555056749311277690}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a91e1015ee7bdcb4a82ca78f985a0d88, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  monsterPrefab: {fileID: 5039225249349585882, guid: 696279c225dd1094995db0cc65a359dc, type: 3}
-  spawnPoint: {fileID: 7193234964608796389}
-  explosionEffect: {fileID: 4020961251572190625}
-  explosionSfx: {fileID: 0}
 --- !u!114 &439891529737450844
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -351,6 +320,38 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &2546959405791354825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1555056749311277690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3659e636e948f4f96a61712375f7b53a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerId: -1
+  requiredParts: 4
+  experimentButton: {fileID: 2511417411882366507}
+  partsCountText: {fileID: 2053025058062496862}
+--- !u!114 &8960614939132145928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1555056749311277690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e54609ef31b01491498aeee0d52fcc11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  monsterPrefab: {fileID: 5039225249349585882, guid: 696279c225dd1094995db0cc65a359dc, type: 3}
+  spawnPoint: {fileID: 7193234964608796389}
+  explosionEffect: {fileID: 4020961251572190625}
+  explosionSfx: {fileID: 0}
 --- !u!1 &2511417411882366507
 GameObject:
   m_ObjectHideFlags: 0
@@ -361,10 +362,10 @@ GameObject:
   m_Component:
   - component: {fileID: 3251744174895268531}
   - component: {fileID: 5582459394087144791}
-  - component: {fileID: 5490483545282350878}
   - component: {fileID: 6581427149559554775}
   - component: {fileID: 4078190195309746706}
   - component: {fileID: 7575672109307067148}
+  - component: {fileID: 8877117455816457303}
   m_Layer: 0
   m_Name: complete button
   m_TagString: Untagged
@@ -382,7 +383,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 1.29, y: -0.81, z: -2.5967586}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2602317006490920665}
@@ -439,21 +440,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &5490483545282350878
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2511417411882366507}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2bd9a39e869cc1488c6ef6a63a7555a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  button_unpressed: {fileID: 21300000, guid: 6c8ad2832b70d604e9e56df2fdc487cc, type: 3}
-  button_pressed: {fileID: 21300000, guid: 794ce5ca1e07eb34b84cbd7c25b2ec41, type: 3}
-  experimentTable: {fileID: 1394759105471802648}
 --- !u!50 &6581427149559554775
 Rigidbody2D:
   serializedVersion: 4
@@ -548,6 +534,21 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &8877117455816457303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2511417411882366507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74e8a6210ad7145f08d245638497b164, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button_unpressed: {fileID: 21300000, guid: 6c8ad2832b70d604e9e56df2fdc487cc, type: 3}
+  button_pressed: {fileID: 21300000, guid: 794ce5ca1e07eb34b84cbd7c25b2ec41, type: 3}
+  experimentTable: {fileID: 2546959405791354825}
 --- !u!1 &4370687437933974271
 GameObject:
   m_ObjectHideFlags: 0

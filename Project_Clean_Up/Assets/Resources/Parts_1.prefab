@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8789263944364274202}
   - component: {fileID: 3543771246704552412}
-  - component: {fileID: 9133298003551287668}
   - component: {fileID: 7042268447067192344}
   - component: {fileID: 1227213692006179884}
   - component: {fileID: 7431592911317487376}
@@ -91,23 +90,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &9133298003551287668
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1934413257229219296}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4919912562a1e4afba5ac1e21a0b257e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  partSprites:
-  - {fileID: 21300000, guid: 2dcc4abb16ca7e04dba044eb963d8112, type: 3}
-  - {fileID: 21300000, guid: bd2be2f8e708e7a41a395f6bd46b919b, type: 3}
-  - {fileID: 21300000, guid: 01da3d44ea0d1d64f8f57a1d2ea81523, type: 3}
-  spriteRenderer: {fileID: 0}
 --- !u!50 &7042268447067192344
 Rigidbody2D:
   serializedVersion: 4
@@ -218,7 +200,6 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 9133298003551287668}
   - {fileID: 7431592911317487376}
   - {fileID: 6445906099244896968}
   sceneViewId: 0
@@ -236,4 +217,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97396b1d1b34d941a6297146a6bc4d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ownerId: 0
+  partId: 0

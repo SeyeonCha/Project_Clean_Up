@@ -3962,17 +3962,27 @@ MonoBehaviour:
   timeText: {fileID: 1420699290}
   countdownText: {fileID: 291633772}
   readyButton: {fileID: 992296502}
-  lobbySceneName: '#01Lobby'
-  timeLimit: 60
+  lobbySceneName: '#01_Lobby'
+  timeLimit: 120
   playerPrefab: {fileID: 1396372912897716163, guid: c85aa4125d7d848e092bb87dbf87614a, type: 3}
   ownerSpawnPoint: {x: -10, y: 0, z: 0}
   player2SpawnPoint: {x: 10, y: 0, z: 0}
+  experimentDeskPrefab: {fileID: 1555056749311277690, guid: 58429f67aec3d4ffe8bb0ae41bfae0e3, type: 3}
+  ownerDeskSpawnPoint: {x: -8, y: -4, z: 0}
+  player2DeskSpawnPoint: {x: 8, y: -4, z: 0}
   trashPrefab: {fileID: 1934413257229219296, guid: 3d7599faad4f248449f984d99bcf8203, type: 3}
   drugPrefab: {fileID: 928677696678052251, guid: bc7a43bf828fb478cbfb8fd33f5c6ef6, type: 3}
   obstaclePrefab: {fileID: 4375336128513244038, guid: b4550e61abfbe44f0bc237d2120f4efe, type: 3}
   bombPrefab: {fileID: 1934413257229219296, guid: c1b837ca6dd035f4283e34a6b7e9c92b, type: 3}
   totalTrashCount: 5
   totalDrugCount: 2
+  partPrefab: {fileID: 1934413257229219296, guid: 0e444685d38e54a409da472d749eba26, type: 3}
+  partsImages:
+  - {fileID: 21300000, guid: bd2be2f8e708e7a41a395f6bd46b919b, type: 3}
+  - {fileID: 21300000, guid: 01da3d44ea0d1d64f8f57a1d2ea81523, type: 3}
+  - {fileID: 21300000, guid: 7d9d3567532c30d448920a903f7f17ed, type: 3}
+  - {fileID: 21300000, guid: bbac895240e772d4c84720128d1b691a, type: 3}
+  totalPartTypes: 4
   drugBoostSettings:
   - rotationBoost: -3
     speedBoost: -3

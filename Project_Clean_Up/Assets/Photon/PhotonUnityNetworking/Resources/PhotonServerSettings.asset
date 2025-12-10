@@ -67,6 +67,9 @@ MonoBehaviour:
   - Hit
   - RpcInitializeBoostAndColor
   - RpcRequestDestroyDrug
+  - RpcSetPartVisualsAndId
+  - RpcSetDeskColor
+  - RpcUpdatePartsText
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
