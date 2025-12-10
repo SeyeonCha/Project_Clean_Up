@@ -109,25 +109,29 @@ public class ThrowableObject : MonoBehaviour
 
         Debug.Log($"쓰레기 던져짐 in ThrowableObject -- {ignoreFirstCollision}");
     }
+
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (currentState != State.Thrown) return;
 
-        Debug.Log($"벽에 닿았는가? {other.gameObject.CompareTag("Wall")}");
+        if (other.gameObject.CompareTag("Player"))
+        {
+            PhotonView playerPV = other.gameObject.GetComponent<PhotonView>();
+            
+            // **주의: 데미지 처리는 보통 마스터 클라이언트에서 처리 후 RPC로 동기화하지만,
+            // 현재 로직을 최대한 유지하기 위해 IsMine 조건을 포함합니다.**
+            if (playerPV != null) 
+            {
+                playerPV.RPC("Hit", RpcTarget.All);
+            }
+
+            SetIdle();
+            return;
+        }
 
         Debug.Log($"onCollision : 레이어 : {gameObject.layer}");
         gameObject.layer = trashLayer; // 레이어 돌려놓기
 
-        // Thrown 상태일 때,
-        if (col.CompareTag("Player") && col.GetComponent<PhotonView>().IsMine)
-        {
-            col.GetComponent<PlayerMovement>().Hit();
-            PV.RPC("DestroyRPC", RpcTarget.AllBuffered);
-
-            // 여기!!!!!!!!!!!!!! 서 닿은 플레이어 데미지 주기!
-            Debug.Log("플레이어 데미지!!");
-        }
-        
         if (ignoreFirstCollision == 0)
         {
             ignoreFirstCollision++;
@@ -136,6 +140,5 @@ public class ThrowableObject : MonoBehaviour
         {
             SetIdle(); // 충돌 후 Idle 상태로 전환.
         }
-
     }
 }

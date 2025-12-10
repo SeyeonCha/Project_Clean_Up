@@ -63,6 +63,10 @@ MonoBehaviour:
   - RpcStartGame
   - RpcTimeIsUp
   - RpcUpdateCountdownText
+  - RpcHandleOpponentExit
+  - Hit
+  - RpcInitializeBoostAndColor
+  - RpcRequestDestroyDrug
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

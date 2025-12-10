@@ -5602,6 +5602,7 @@ GameObject:
   - component: {fileID: 246361703}
   - component: {fileID: 246361702}
   - component: {fileID: 246361704}
+  - component: {fileID: 246361705}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -5699,10 +5700,49 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 246361702}
+  - {fileID: 246361705}
   sceneViewId: 1
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &246361705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 246361701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9614246e6c7174ce9ba241b38af248a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeText: {fileID: 0}
+  endText: {fileID: 0}
+  retryButton: {fileID: 0}
+  retryPanel: {fileID: 0}
+  winMessage: GAME CLEAR!
+  loseMessage: GAME OVER!
+  startingTime: 60
+  trashPrefab: {fileID: 0}
+  totalTrashCount: 5
+  trashImages: []
+  partPrefab: {fileID: 0}
+  partsImages: []
+  drugPrefab: {fileID: 0}
+  totalDrugCount: 2
+  drugColorsForSpawning: []
+  drugBoostSettings: []
+  obstaclePrefab: {fileID: 0}
+  totalObstacleCount: 2
+  mapBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 10, y: 5, z: 0}
+  ExperimentCompleted: 0
+  experimentButton: {fileID: 0}
+  bombPrefab: {fileID: 0}
+  minBombSpawnTime: 10
+  maxBombSpawnTime: 25
+  maxBombsToSpawn: 2
 --- !u!1 &261769403
 GameObject:
   m_ObjectHideFlags: 0
@@ -14380,7 +14420,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1687644074
 RectTransform:
   m_ObjectHideFlags: 0

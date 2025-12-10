@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Photon.Pun;
 
-public class Bomb : MonoBehaviour
+public class Bomb : MonoBehaviourPun
 {
     public float fuseTime = 5.0f;           // 폭발까지의 시간
     public float explosionRadius = 5.0f;    // 폭발 범위
@@ -17,6 +18,8 @@ public class Bomb : MonoBehaviour
 
     void Start()
     {
+        Debug.Log($"[{PhotonNetwork.LocalPlayer.NickName}] 폭탄이 생성되었습니다. PV ID: {photonView.ViewID}");
+
         // 5초 후에 Explode 함수를 호출 (타이머)
         currentTime = fuseTime;
     }

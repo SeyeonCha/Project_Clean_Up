@@ -3,7 +3,7 @@ using Photon.Pun; // ✨ 추가: Photon 기능을 사용하기 위해 필요합�
 
 public class PlayerGrabThrow : MonoBehaviourPun
 {
-    private GameManager gameManager; // 게임 매니저 참조
+    // private GameManager gameManager; // 게임 매니저 참조
 
     public float throwPower = 7f;
     
@@ -30,7 +30,7 @@ public class PlayerGrabThrow : MonoBehaviourPun
 
     void Awake() 
     {
-        gameManager = FindObjectOfType<GameManager>();
+        // gameManager = FindObjectOfType<GameManager>();
         // PV를 수동으로 할당하지 않았다면 Awake에서 GetComponent로 가져와야 합니다.
         if (PV == null)
         {
@@ -40,10 +40,24 @@ public class PlayerGrabThrow : MonoBehaviourPun
 
     void Update()
     {
-        // 게임이 활성화 상태일 때만 입력 처리
-        if (gameManager == null || gameManager.IsGameActive())
+        // // 게임이 활성화 상태일 때만 입력 처리
+        // if (gameManager == null || gameManager.IsGameActive())
+        // {
+        //     HandleTrashGrab();
+        // }
+
+        // ⭐ 핵심 수정: InGameManager.Instance.IsMovementAllowed()를 사용하여 게임 활성화 상태 확인
+        // InGameManager.IsMovementAllowed()는 isGameActive, isCountdownActive, isGameOver 상태를 모두 고려합니다.
+        if (InGameManager.Instance != null && InGameManager.Instance.IsMovementAllowed())
         {
             HandleTrashGrab();
+        }
+        
+        // ⭐ 추가: InGameManager가 없을 경우 (예외 처리)
+        if (InGameManager.Instance == null)
+        {
+             Debug.LogWarning("InGameManager.Instance가 씬에 없습니다. 입력 처리를 건너뜁니다.");
+             return;
         }
     }
 

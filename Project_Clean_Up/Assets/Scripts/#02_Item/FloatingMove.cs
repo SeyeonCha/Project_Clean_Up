@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
-using Photon.Realtime;
+using Photon.Pun; 
 
-public class FloatingMove : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상속 변경
+public class FloatingMove : MonoBehaviourPunCallbacks, IPunObservable 
 {
     public Vector2 initialVelocity = new Vector2(1f,0f);
     public float minSpeed = 1f;       
@@ -13,14 +12,14 @@ public class FloatingMove : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상
     public float randomAngle = 30f;   
 
     private Rigidbody2D rb; 
-    private PhotonView PV; // ✨ 추가: PhotonView 참조
+    private PhotonView PV; 
     
     // ✨ 추가: 네트워크 동기화 변수
     private Vector3 curPos; 
     private Quaternion curRot;
-    public float syncRate = 10f; // 동기화 속도
+    public float syncRate = 10f; 
 
-    void Awake() // Start 대신 Awake 사용
+    void Awake() 
     {
         PV = GetComponent<PhotonView>();
         rb = GetComponent<Rigidbody2D>();
@@ -31,8 +30,6 @@ public class FloatingMove : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상
 
     void Start()
     {
-        // ✨ 마스터 클라이언트 또는 오브젝트 소유자만 초기 속도를 설정합니다.
-        // 마스터 클라이언트가 생성했으므로, 초기에는 마스터 클라이언트가 소유자입니다.
         if (PV.IsMine && rb != null)
         {
             rb.velocity = initialVelocity;
@@ -92,7 +89,7 @@ public class FloatingMove : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상
             // 🚀 소유자(IsMine): 위치와 회전 전송
             if (rb != null)
             {
-                // Rigidbody의 위치와 회전을 전송하는 것이 물리 동기화에 더 적합합니다.
+                // Vector2 (rb.position)와 float (rb.rotation)을 전송합니다.
                 stream.SendNext(rb.position);
                 stream.SendNext(rb.rotation);
             }
@@ -100,8 +97,13 @@ public class FloatingMove : MonoBehaviourPunCallbacks, IPunObservable // ✨ 상
         else
         {
             // 📥 비소유자(Not IsMine): 위치와 회전 수신
-            curPos = (Vector3)stream.ReceiveNext();
-            curRot = Quaternion.Euler(0, 0, (float)stream.ReceiveNext()); // Z축 회전만 수신
+            // ⭐ 수정: 전송된 Vector2를 Vector2로 정확히 수신합니다.
+            Vector2 networkPosition2D = (Vector2)stream.ReceiveNext();
+            curPos = networkPosition2D; // Vector2를 Vector3 curPos에 할당 (Z=0으로 자동 변환)
+
+            // float으로 회전 수신 후 Quaternion에 적용
+            float networkRotationZ = (float)stream.ReceiveNext(); 
+            curRot = Quaternion.Euler(0, 0, networkRotationZ);
         }
     }
 }

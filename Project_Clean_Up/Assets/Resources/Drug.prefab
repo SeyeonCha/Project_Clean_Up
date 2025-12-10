@@ -22,7 +22,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8138350087120184888
 Transform:
   m_ObjectHideFlags: 0
@@ -182,6 +182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc2c3c87410fea34ba1a5fce0bcb2ad6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 468312242285875405}
 --- !u!114 &4559378216613902768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,7 +203,6 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 8972785251839195814}
-  - {fileID: 6347601117023511878}
   - {fileID: 6064350133231222424}
   sceneViewId: 0
   InstantiationId: 0

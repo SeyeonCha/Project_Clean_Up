@@ -338,8 +338,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fuseTime: 5
-  explosionRadius: 5
-  explosionForce: 200
+  explosionRadius: 3
+  explosionForce: 20
   timerText: {fileID: 5783056993155051785}
   explosionEffectPrefab: {fileID: 984486175841966489, guid: 5c5444ef855eef64b9313ee3b5dacbb6, type: 3}
 --- !u!114 &580909179839898992

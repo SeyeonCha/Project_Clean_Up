@@ -2052,7 +2052,7 @@ MonoBehaviour:
   playerUI_2: {fileID: 1533048962}
   nicknameText_2: {fileID: 165967311}
   readyStateText_2: {fileID: 1425525410}
-  gameSceneName: '#02Game'
+  gameSceneName: '#02_Game'
 --- !u!114 &518054951
 MonoBehaviour:
   m_ObjectHideFlags: 0

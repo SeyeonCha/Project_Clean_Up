@@ -18,7 +18,7 @@ public class Parts : MonoBehaviourPun
     {
         partId = id;
         if (sr == null) sr = GetComponent<SpriteRenderer>();
-        sr.sprite = GameManager.Instance.partsImages[spriteIndex];
+        // sr.sprite = GameManager.Instance.partsImages[spriteIndex];
     }
 
 }

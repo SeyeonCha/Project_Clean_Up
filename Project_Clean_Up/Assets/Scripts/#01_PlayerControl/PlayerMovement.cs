@@ -18,7 +18,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     Vector3 curPos;
     Quaternion curRot;
     
-    private GameManager gameManager; // 게임 매니저 참조
+    // 🔥🔥
+    // private GameManager gameManager; // 게임 매니저 참조
     
     // private Rigidbody2D rb; 
 
@@ -57,7 +58,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         NickNameText.text = PV.IsMine ? PhotonNetwork.NickName : PV.Owner.NickName;
         NickNameText.color = PV.IsMine ? Color.green : Color.red;
 
-        gameManager = FindObjectOfType<GameManager>();
+        // 🔥🔥
+        // gameManager = FindObjectOfType<GameManager>();
         
         rb = GetComponent<Rigidbody2D>();
         Grabber = GetComponent<PlayerGrabThrow>();
@@ -72,7 +74,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         if (PV.IsMine)
         {
             // 게임이 활성화 상태일 때만 입력 처리
-            if (gameManager == null || gameManager.IsGameActive())
+            // 🔥🔥
+            // if (gameManager == null || gameManager.IsGameActive())
+            // {
+            if (InGameManager.Instance != null && InGameManager.Instance.IsMovementAllowed())
             {
                 // a,d키 인풋 받기
                 GetInput();
@@ -108,7 +113,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 
     private void FixedUpdate()
     {
-        if (gameManager == null || gameManager.IsGameActive())
+        // 🔥🔥
+        // if (gameManager == null || gameManager.IsGameActive())
+        // {
+        // ⭐ 4. 수정: InGameManager.Instance.IsMovementAllowed()를 사용하여 움직임 가능 여부 체크
+        if (InGameManager.Instance != null && InGameManager.Instance.IsMovementAllowed())
         {
             Rotate(); // 인풋받은 h와 기본 설정한 rotationSpeed로 플레이어 회전시키기
             if (!isTouchingWall) // 벽에서 떨어지면 코요테 타이머 시간 감소
@@ -241,18 +250,28 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     // 플레이어 데미지 입을 때 불러올 함수
+    [PunRPC]
     public void Hit()
     {
-        HealthImage.fillAmount -= 0.1f;
-        if (HealthImage.fillAmount <= 0)
+        if (PV.IsMine)
         {
-            GameObject.Find("Canvas").transform.Find("RespawnPanel").gameObject.SetActive(true);
-            PV.RPC("DestroyRPC", RpcTarget.AllBuffered);
+            if (HealthImage != null)
+            {
+                HealthImage.fillAmount -= 0.1f;
+            }
+            
+            if (HealthImage != null && HealthImage.fillAmount <= 0)
+            {
+                if (InGameManager.Instance != null)
+                {
+                    InGameManager.Instance.PlayerDied(PV.Owner); 
+                }
+            }
         }
     }
 
-    [PunRPC]
-    void DestroyRPC() => Destroy(gameObject);
+    // [PunRPC]
+    // void DestroyRPC() => Destroy(gameObject);
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {

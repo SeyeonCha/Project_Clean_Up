@@ -296,7 +296,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             Booster booster = drugObj.GetComponent<Booster>();
             if (booster != null)
             {
-                booster.InitializeBoostAndColor(setting.rotationBoost, setting.speedBoost, setting.duration, itemColor);
+               // booster.InitializeBoostAndColor(setting.rotationBoost, setting.speedBoost, setting.duration, itemColor);
             }
         }
         Debug.Log($"Drug {totalDrugCount}개 스폰 완료 및 색상/부스트 설정 할당.");

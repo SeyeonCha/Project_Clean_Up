@@ -800,7 +800,7 @@ MonoBehaviour:
   EnterPanel: {fileID: 1227467517}
   NickNameInput: {fileID: 234563714}
   ConnectButton: {fileID: 132352140}
-  lobbySceneName: '#01Lobby'
+  lobbySceneName: '#01_Lobby'
 --- !u!1 &578962324
 GameObject:
   m_ObjectHideFlags: 0
