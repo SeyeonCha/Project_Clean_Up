@@ -14,6 +14,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     public PhotonView PV;
     public TMP_Text NickNameText;
     public Image HealthImage;
+    [Header("Player Sounds")]
+    public AudioSource audioSource;         // 소리 재생을 위한 AudioSource 컴포넌트
+    public AudioClip kickSoundClip;         // 킥 사운드 파일
+    public AudioClip damageSoundClip;       // 데미지 사운드 파일
 
     Vector3 curPos;
     Quaternion curRot;
@@ -58,11 +62,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
         NickNameText.text = PV.IsMine ? PhotonNetwork.NickName : PV.Owner.NickName;
         NickNameText.color = PV.IsMine ? Color.green : Color.red;
 
-        // 🔥🔥
-        // gameManager = FindObjectOfType<GameManager>();
-        
         rb = GetComponent<Rigidbody2D>();
         Grabber = GetComponent<PlayerGrabThrow>();
+
+        // ⭐ AudioSource 컴포넌트 가져오기
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
 
         originalRotationSpeed = rotationSpeed; // 초기 회전 속도
         
@@ -147,6 +154,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     public void Kick()
     {
         rb.AddForce(transform.up*1f, ForceMode2D.Impulse);
+
+        if (PV.IsMine)
+        {
+            PV.RPC("RpcPlayKickSound", RpcTarget.All);
+        }
     }
     // 🔥🔥
 
@@ -159,6 +171,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
 
         transform.position += (Vector3)lastWallNormal * 0.05f;
         Debug.Log("Kick!");
+
+        if (PV.IsMine)
+        {
+            PV.RPC("RpcPlayKickSound", RpcTarget.All);
+        }
     }
 
     public void Rotate()
@@ -253,6 +270,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void Hit()
     {
+        PlayDamageSound();
+
         if (PV.IsMine)
         {
             if (HealthImage != null)
@@ -286,6 +305,29 @@ public class PlayerMovement : MonoBehaviourPunCallbacks, IPunObservable
             CurPos = (Vector3)stream.ReceiveNext();
             curRot = (Quaternion)stream.ReceiveNext();
             HealthImage.fillAmount = (float)stream.ReceiveNext();
+        }
+    }
+
+    // ==========================================================
+    // ⭐ 사운드 재생 로직
+    // ==========================================================
+
+    // 킥 사운드 재생 (RPC로 호출됨)
+    [PunRPC]
+    private void RpcPlayKickSound()
+    {
+        if (audioSource != null && kickSoundClip != null)
+        {
+            audioSource.PlayOneShot(kickSoundClip);
+        }
+    }
+
+    // 데미지 사운드 재생 (Hit RPC를 받은 모든 클라이언트에서 로컬로 실행)
+    private void PlayDamageSound()
+    {
+        if (audioSource != null && damageSoundClip != null)
+        {
+            audioSource.PlayOneShot(damageSoundClip);
         }
     }
 }

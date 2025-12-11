@@ -17,6 +17,12 @@ public class PlayerGrabThrow : MonoBehaviourPun
     [Header("Throwing Settings")]
     public float throwForceMultiplier = 0.05f; // 던지는 힘의 배수
 
+    // ⭐⭐ 사운드 관련 변수 추가 ⭐⭐
+    [Header("Sound Settings")]
+    public AudioSource audioSource;
+    public AudioClip grabSoundClip;
+    public AudioClip releaseSoundClip;
+
     // 현재 잡고 있는 쓰레기 오브젝트
     private GameObject heldTrash = null;
     // 쓰레기가 붙잡힐 팔의 Transform
@@ -35,6 +41,12 @@ public class PlayerGrabThrow : MonoBehaviourPun
         if (PV == null)
         {
             PV = GetComponent<PhotonView>();
+        }
+
+        // ⭐ AudioSource 컴포넌트 가져오기
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
         }
     }
 
@@ -109,6 +121,9 @@ public class PlayerGrabThrow : MonoBehaviourPun
                     {
                         trashPV.RequestOwnership();
                     }
+
+                    // ⭐⭐ 핵심 수정: 잡기 사운드 RPC 호출
+                    PV.RPC("RpcPlayGrabSound", RpcTarget.All);
                     
                     // 2. RPC를 호출하여 모든 클라이언트에서 잡는 로직을 실행합니다.
                     PV.RPC("RpcGrabTrash", RpcTarget.All, trashPV.ViewID, armIndex);
@@ -119,6 +134,9 @@ public class PlayerGrabThrow : MonoBehaviourPun
         {
             if (heldTrash != null)
             {
+                // ⭐⭐ 핵심 수정: 놓기 사운드 RPC 호출
+                PV.RPC("RpcPlayReleaseSound", RpcTarget.All);
+
                 // RPC를 호출하여 모든 클라이언트에서 놓는 로직을 실행합니다.
                 PV.RPC("RpcDropTrash", RpcTarget.All);
             }
@@ -250,5 +268,24 @@ public class PlayerGrabThrow : MonoBehaviourPun
             Debug.Log("Trash 놓기");
         }
     }
-    
+
+    // 🔗 RPC 수신: 잡기 사운드 재생
+    [PunRPC]
+    private void RpcPlayGrabSound()
+    {
+        if (audioSource != null && grabSoundClip != null)
+        {
+            audioSource.PlayOneShot(grabSoundClip);
+        }
+    }
+
+    // 🔗 RPC 수신: 놓기 사운드 재생
+    [PunRPC]
+    private void RpcPlayReleaseSound()
+    {
+        if (audioSource != null && releaseSoundClip != null)
+        {
+            audioSource.PlayOneShot(releaseSoundClip);
+        }
+    }
 }

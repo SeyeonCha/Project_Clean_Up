@@ -9,6 +9,11 @@ public class Booster : MonoBehaviourPun
     private float rotationBoostAmount = 200f;
     private float speedBoostAmount = 5f; 
     private float boostDuration = 5f;
+
+    // ⭐ 사운드 관련 변수 추가
+    [Header("Item Sounds")]
+    public AudioSource audioSource;         // 소리 재생을 위한 AudioSource 컴포넌트
+    public AudioClip collectSoundClip;
     
     // ⭐ 색상 관련 변수
     public SpriteRenderer spriteRenderer; 
@@ -19,6 +24,12 @@ public class Booster : MonoBehaviourPun
         if (spriteRenderer == null)
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
+        }
+
+        // ⭐ AudioSource 컴포넌트 가져오기
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
         }
     }
     
@@ -69,6 +80,12 @@ public class Booster : MonoBehaviourPun
         {
             Debug.Log("Drug 효과 로컬 적용: " + PhotonNetwork.LocalPlayer.NickName);
             player.ApplyBoostItem(rotationBoostAmount, speedBoostAmount, boostDuration);
+
+            if (audioSource != null && collectSoundClip != null)
+            {
+                // PlayOneShot을 사용하여 다른 소리와 겹쳐 재생될 수 있도록 합니다.
+                audioSource.PlayOneShot(collectSoundClip);
+            }
         }
         
         // 2. Master Client에게 이 Drug 오브젝트를 파괴하도록 요청 (RPC 호출)

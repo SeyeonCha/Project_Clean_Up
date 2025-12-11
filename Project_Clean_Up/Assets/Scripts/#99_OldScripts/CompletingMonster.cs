@@ -7,11 +7,8 @@ public class CompletingMonster : MonoBehaviourPun
 {
     public GameObject monsterPrefab;       // 등장할 몬스터
     public Transform spawnPoint;           // 등장 위치
-
     public ParticleSystem explosionEffect; // 폭발 파티클
     public AudioSource explosionSfx;       // 폭발 사운드
-
-    private GameManager gameManager;
     private bool alreadySpawned = false;
 
     private Experiment experimentTable;

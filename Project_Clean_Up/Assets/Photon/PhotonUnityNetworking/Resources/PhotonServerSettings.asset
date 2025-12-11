@@ -72,6 +72,9 @@ MonoBehaviour:
   - RpcUpdatePartsText
   - RpcRequestPressButton
   - RpcProcessButtonPress
+  - RpcPlayKickSound
+  - RpcPlayGrabSound
+  - RpcPlayReleaseSound
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
