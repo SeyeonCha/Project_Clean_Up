@@ -116,27 +116,29 @@ public class ThrowableObject : MonoBehaviour
 
         if (other.gameObject.CompareTag("Player"))
         {
-            PhotonView playerPV = other.gameObject.GetComponent<PhotonView>();
+            
             
             // **주의: 데미지 처리는 보통 마스터 클라이언트에서 처리 후 RPC로 동기화하지만,
             // 현재 로직을 최대한 유지하기 위해 IsMine 조건을 포함합니다.**
-            if (playerPV != null) 
-            {
-                playerPV.RPC("Hit", RpcTarget.All);
-
-                
-            }
+            
 
             // SetIdle();
             if (ignoreFirstCollision == 0)
             {
                 ignoreFirstCollision++;
+                return;
             }
             else
             {
+                PhotonView playerPV = other.gameObject.GetComponent<PhotonView>();
+                if (playerPV != null) 
+                {
+                    playerPV.RPC("Hit", RpcTarget.All);
+                    
+                }
                 SetIdle(); // 충돌 후 Idle 상태로 전환.
+                return;
             }
-            // return;
         }
 
         Debug.Log($"onCollision : 레이어 : {gameObject.layer}");
