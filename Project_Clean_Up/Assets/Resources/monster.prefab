@@ -161,9 +161,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e3a56dffbede8047bf4099f1d59878c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  monster: {fileID: 8641762858894383414}
-  OpponentInside: 0
-  ownerId: 0
 --- !u!1 &5039225249349585882
 GameObject:
   m_ObjectHideFlags: 0

@@ -134,7 +134,6 @@ public class ThrowableObject : MonoBehaviour
                 if (playerPV != null) 
                 {
                     playerPV.RPC("Hit", RpcTarget.All);
-                    
                 }
                 SetIdle(); // 충돌 후 Idle 상태로 전환.
                 return;

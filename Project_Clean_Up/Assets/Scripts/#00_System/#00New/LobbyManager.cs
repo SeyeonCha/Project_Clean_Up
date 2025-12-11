@@ -47,7 +47,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     private const int MAX_PLAYERS = 2;
     private bool isReady = false; 
     private Coroutine countdownCoroutine;
-    private const int START_COUNTDOWN_TIME = 10;
+    private const int START_COUNTDOWN_TIME = 3;
 
     [Header("Scene Settings")]
     public string gameSceneName = "GameScene";

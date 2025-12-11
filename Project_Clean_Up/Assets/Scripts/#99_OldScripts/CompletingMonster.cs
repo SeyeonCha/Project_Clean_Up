@@ -18,7 +18,6 @@ public class CompletingMonster : MonoBehaviourPun
 
     void Start()
     {
-        gameManager = FindObjectOfType<GameManager>();
         experimentTable = GetComponent<Experiment>();
     }
 
@@ -35,7 +34,11 @@ public class CompletingMonster : MonoBehaviourPun
         if (alreadySpawned) return;
         alreadySpawned = true;
 
-        photonView.RPC("RpcSpawnMonsterSequence", RpcTarget.All);
+        // ⭐ 핵심 수정: Master Client만 RPC를 호출합니다.
+        if (PhotonNetwork.IsMasterClient)
+        {
+            photonView.RPC("RpcSpawnMonsterSequence", RpcTarget.All);
+        }
     }
     [PunRPC]
     private void RpcSpawnMonsterSequence()
@@ -59,21 +62,46 @@ public class CompletingMonster : MonoBehaviourPun
         // 4. 잠깐 딜레이 후 몬스터 등장
         yield return new WaitForSeconds(0.25f);
 
-        GameObject monster = PhotonNetwork.Instantiate(monsterPrefab.name,
-                                spawnPoint.position,
-                                Quaternion.identity);
-
-
-        // 몬스터에게 실험대 소유자 정보 전달 -> 같은 ownerId로 만들기
+        GameObject monster = null;
+        PhotonView monsterPV = null;
         int owner = experimentTable.ownerId;
-        PhotonView monsterPV = monster.GetComponent<PhotonView>();
-        photonView.RPC("RpcInitMonsterOwner", RpcTarget.All, monsterPV.ViewID, owner);
 
-        Animator anim = monster.GetComponent<Animator>();
-        anim.SetTrigger("StartRise");
+        // ⭐ 핵심 수정: Master Client만 몬스터를 생성하고 RPC를 호출합니다.
+        if (PhotonNetwork.IsMasterClient)
+        {
+            monster = PhotonNetwork.Instantiate(monsterPrefab.name,
+                                            spawnPoint.position,
+                                            Quaternion.identity);
+
+            monsterPV = monster.GetComponent<PhotonView>();
+
+            // 몬스터에게 실험대 소유자 정보 전달 -> 같은 ownerId로 만들기
+            if (monsterPV != null)
+            {
+                // Master Client가 생성 후, 모든 클라이언트에게 초기화 명령을 내립니다.
+                photonView.RPC("RpcInitMonsterOwner", RpcTarget.All, monsterPV.ViewID, owner);
+            }
+        }
+        
+        // ⭐ 비마스터 클라이언트도 애니메이션을 재생할 수 있도록,
+        // Animator와 애니메이션 트리거 코드는 Monster Prefab의 Start/Awake에 두는 것이 일반적입니다.
+        
+        // 하지만 현재는 Master Client가 생성 후 코드를 실행하므로,
+        // Master Client가 애니메이션을 트리거하고, 이것이 PhotonView를 통해 동기화되도록 합니다.
+        // (Monster Prefab에 Animator 동기화 설정이 되어 있다고 가정)
+        if (monster != null)
+        {
+            Animator anim = monster.GetComponent<Animator>();
+            if (anim != null)
+            {
+                anim.SetTrigger("StartRise");
+            }
+        }
+
 
         Debug.Log("몬스터 등장!");
     }
+
     [PunRPC]
     void RpcInitMonsterOwner(int monsterViewID, int ownerID) // 생성한 monster에 ownerId 설정
     {
@@ -84,6 +112,13 @@ public class CompletingMonster : MonoBehaviourPun
         if (monster != null)
         {
             monster.SetOwner(ownerID);
+            
+            // ⭐ 애니메이션을 RPC 초기화 시점에서 실행하도록 보강 (선택 사항)
+            Animator anim = monster.GetComponent<Animator>();
+            if (anim != null)
+            {
+                anim.SetTrigger("StartRise");
+            }
         }
     }
 }
