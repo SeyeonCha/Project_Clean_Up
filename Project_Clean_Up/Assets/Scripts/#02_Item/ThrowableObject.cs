@@ -143,7 +143,7 @@ public class ThrowableObject : MonoBehaviour
 
         Debug.Log($"onCollision : 레이어 : {gameObject.layer}");
         gameObject.layer = trashLayer; // 레이어 돌려놓기
-
+        SetIdle();
         
     }
 }
