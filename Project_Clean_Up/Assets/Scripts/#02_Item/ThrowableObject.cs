@@ -123,22 +123,25 @@ public class ThrowableObject : MonoBehaviour
             if (playerPV != null) 
             {
                 playerPV.RPC("Hit", RpcTarget.All);
+
+                
             }
 
-            SetIdle();
-            return;
+            // SetIdle();
+            if (ignoreFirstCollision == 0)
+            {
+                ignoreFirstCollision++;
+            }
+            else
+            {
+                SetIdle(); // 충돌 후 Idle 상태로 전환.
+            }
+            // return;
         }
 
         Debug.Log($"onCollision : 레이어 : {gameObject.layer}");
         gameObject.layer = trashLayer; // 레이어 돌려놓기
 
-        if (ignoreFirstCollision == 0)
-        {
-            ignoreFirstCollision++;
-        }
-        else
-        {
-            SetIdle(); // 충돌 후 Idle 상태로 전환.
-        }
+        
     }
 }
