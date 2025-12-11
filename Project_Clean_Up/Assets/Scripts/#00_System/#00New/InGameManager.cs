@@ -88,7 +88,7 @@ public class InGameManager : MonoBehaviourPunCallbacks, IPunObservable
     // ==========================================================
     // ⭐ Private & Network Variables
     // ==========================================================
-    private PhotonView PV;
+    public PhotonView PV;
     private float currentTime;
     private bool isGameActive = false;
     private bool isGameOver = false;
@@ -841,5 +841,45 @@ public class InGameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         // 기존의 OnLobbyButtonClicked 함수를 재사용합니다.
         OnLobbyButtonClicked(); 
+    }
+
+    // ==========================================================
+    // ⭐ 버튼/Desk 중앙 처리 RPC (Master Client 전용)
+    // ==========================================================
+
+    [PunRPC]
+    public void RpcProcessButtonPress(int experimentDeskViewID)
+    {
+        // Master Client에서만 실행
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        PhotonView deskPV = PhotonView.Find(experimentDeskViewID);
+        if (deskPV == null)
+        {
+            Debug.LogError($"Master Client: Desk PV ID {experimentDeskViewID}를 찾을 수 없어 버튼 처리에 실패했습니다.");
+            return;
+        }
+        
+        Experiment experiment = deskPV.GetComponent<Experiment>();
+        if (experiment == null || experiment.experimentButton == null)
+        {
+            Debug.LogError("Master Client: Desk 또는 Button 오브젝트를 찾을 수 없습니다.");
+            return;
+        }
+
+        // ⭐ 1. Desk에 붙어있는 Button 오브젝트의 PhotonView를 찾습니다.
+        PhotonView buttonPV = experiment.experimentButton.GetComponent<PhotonView>();
+        
+        if (buttonPV != null)
+        {
+            // ⭐ 2. Master Client가 직접 Button의 RPC를 모든 클라이언트에게 호출합니다.
+            // Button의 RpcPressButton 함수는 로직이 간단하므로 직접 호출합니다.
+            buttonPV.RPC("RpcPressButton", RpcTarget.All);
+            Debug.Log($"Master Client: Desk {experimentDeskViewID}의 버튼 누름 요청 처리 완료.");
+        }
+        else
+        {
+            Debug.LogError("Master Client: Button 오브젝트에 PhotonView가 없습니다!");
+        }
     }
 }

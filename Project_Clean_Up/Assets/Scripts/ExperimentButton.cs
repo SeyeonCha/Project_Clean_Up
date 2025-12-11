@@ -34,10 +34,11 @@ public class ExperimentButton : MonoBehaviourPun
         }
     }
 
+    // ExperimentButton.cs (OnTriggerEnter2D 함수)
     void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) {
-            // Debug.Log("DEBUG: Tag Not Player"); // 너무 자주 찍힐 수 있음
+            // Debug.Log("DEBUG: Tag Not Player"); 
             return;
         }
         if (isPressed) {
@@ -57,7 +58,7 @@ public class ExperimentButton : MonoBehaviourPun
             return;
         }
 
-        // 1. 충돌한 플레이어가 로컬 플레이어인지 확인
+        // 1. 충돌한 플레이어가 로컬 플레이어인지 확인 (입력 권한)
         if (!playerPV.IsMine) {
             Debug.Log("DEBUG: Not my local player (Ignore).");
             return; 
@@ -72,16 +73,40 @@ public class ExperimentButton : MonoBehaviourPun
         int localActorId = playerPV.Owner.ActorNumber;
         int deskOwnerId = experimentTable.ownerId;
         
-        // ⭐⭐ 핵심 확인: 소유자가 일치하는가? ⭐⭐
+        // ⭐⭐ 3. 소유자가 일치하는지 확인 (자신의 Desk인지) ⭐⭐
         if (localActorId == deskOwnerId) 
         {
-            Debug.Log($"SUCCESS! Local Player ({localActorId}) is Desk Owner. Calling RPC.");
-            photonView.RPC("RpcPressButton", RpcTarget.All);
+            Debug.Log($"SUCCESS! Local Player ({localActorId}) is Desk Owner. Requesting RPC.");
+            
+            // 4. InGameManager의 PV를 통해 Master Client에게 요청합니다.
+            // 이 요청은 Master Client가 Desk의 PhotonView를 찾아서 RpcPressButton을 호출하게 합니다.
+            if (InGameManager.Instance != null && InGameManager.Instance.PV != null)
+            {
+                // InGameManager에 구현된 RpcProcessButtonPress를 호출합니다.
+                InGameManager.Instance.PV.RPC("RpcProcessButtonPress", RpcTarget.MasterClient, experimentTable.photonView.ViewID);
+                Debug.Log("Client가 InGameManager PV를 통해 Master Client에게 버튼 처리 요청.");
+            }
+            else
+            {
+                Debug.LogError("InGameManager 또는 PV를 찾을 수 없습니다!");
+            }
         }
         else
         {
             Debug.Log($"DEBUG: Failed. Local Player ({localActorId}) is NOT Desk Owner ({deskOwnerId}).");
         }
+    }
+
+    // ⭐⭐ 새로운 RPC 추가: Master Client에게 버튼 누름 처리를 요청
+    [PunRPC]
+    public void RpcRequestPressButton()
+    {
+        // 이 RPC는 Master Client에서만 실행됩니다.
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        // Master Client가 받아서, 최종적으로 모든 클라이언트에게 버튼 눌림 상태를 동기화합니다.
+        photonView.RPC("RpcPressButton", RpcTarget.All);
+        Debug.Log("Master Client가 요청받아 RpcPressButton 호출");
     }
     
     [PunRPC]
